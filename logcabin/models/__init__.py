@@ -19,6 +19,8 @@ from sqlalchemy.orm import (
 )
 from zope.sqlalchemy import ZopeTransactionExtension
 
+from logcabin.models.types import URLSegment, EmailAddress
+
 Session = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
@@ -26,14 +28,14 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    username = Column(Unicode(50), nullable=False) # Gotta be alphanumeric
+    username = Column(URLSegment, nullable=False)
     password = Column(String(60), nullable=False) # bcrypt hash
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_online = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_ip = Column(INET, nullable=False)
     status = Column(Enum("guest", "active", "banned", name="user_status"), nullable=False, default=u"active")
     unban_date = Column(DateTime)
-    email_address = Column(Unicode(255), nullable=False)
+    email_address = Column(EmailAddress, nullable=False)
     email_verified = Column(Boolean, nullable=False, default=False)
     timezone = Column(Unicode(255), nullable=False, default="UTC")
 
