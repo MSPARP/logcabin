@@ -2,5 +2,6 @@
 *.db
 *.ini
 *.log
+*.sqlite
 *.egg-info/
 data/
