@@ -13,11 +13,27 @@ pyramid.debug_routematch = false
 pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_debugtoolbar
+    pyramid_redis_sessions
     pyramid_tm
 
 sqlalchemy.url = sqlite:///%(here)s/logcabin.sqlite
 
 mako.directories = logcabin:templates
+
+# session settings
+redis.sessions.secret = your_cookie_signing_secret
+redis.sessions.timeout = 3600
+
+# session cookie settings
+redis.sessions.cookie_name = logcabin
+redis.sessions.cookie_max_age = 31536000
+redis.sessions.cookie_path = /
+redis.sessions.cookie_domain = localhost
+redis.sessions.cookie_secure = True
+redis.sessions.cookie_httponly = True
+redis.sessions.cookie_on_exception = True
+
+redis.sessions.prefix = session:
 
 # By default, the toolbar only appears for clients from IP addresses
 # '127.0.0.1' and '::1'.

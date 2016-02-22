@@ -24,3 +24,8 @@ class Color(RegexValidatedType): # TODO force lower case
     impl = Unicode(6)
     regex = re.compile("^[A-Fa-f0-9]{6}$")
 
+    def process_bind_param(self, value, dialect):
+        if value:
+            value = value.lower()
+        return super().process_bind_param(value, dialect)
+
