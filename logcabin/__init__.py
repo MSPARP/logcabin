@@ -16,6 +16,10 @@ def main(global_config, **settings):
 
     config.add_route("home", "/")
 
+    config.add_route("account.register", "/account/register")
+    config.add_route("account.log_in", "/account/log_in")
+    config.add_route("account.log_out", "/account/log_out")
+
     config.scan()
     return config.make_wsgi_app()
 

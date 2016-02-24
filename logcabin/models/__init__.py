@@ -1,5 +1,6 @@
 import datetime
 
+from bcrypt import gensalt, hashpw
 from sqlalchemy import (
     func,
     CheckConstraint,
@@ -34,7 +35,7 @@ class User(Base):
             or
             (password IS NULL AND email_address IS NULL AND email_verified IS NULL)
         """, name="user_password_and_email"),
-        CheckConstraint("unban_date IS NOT NULL OR status = 'banned'", name="user_unban_date"),
+        CheckConstraint("unban_date IS NOT NULL OR status != 'banned'", name="user_unban_date"),
     )
     id = Column(Integer, primary_key=True)
     username = Column(URLSegment, nullable=False)
@@ -50,6 +51,16 @@ class User(Base):
 
     def __repr__(self):
         return "<User #{}: {}>".format(self.id, self.username)
+
+    def set_password(self, password):
+        if not password:
+            raise ValueError("Password can't be blank.")
+        self.password = hashpw(password.encode("utf8"), gensalt())
+
+    def check_password(self, password):
+        if not self.password:
+            return False
+        return hashpw(password.encode("utf8"), self.password.encode()) == self.password.encode()
 
 
 Index("users_username", func.lower(User.username), unique=True)

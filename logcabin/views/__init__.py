@@ -4,6 +4,6 @@ from logcabin.models import Session, User
 
 
 @view_config(route_name="home", renderer="home.mako")
-def my_view(request):
+def home(request):
     return {}
 
