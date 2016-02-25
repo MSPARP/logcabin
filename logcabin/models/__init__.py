@@ -46,7 +46,7 @@ class User(Base):
     status = Column(Enum("guest", "active", "banned", name="user_status"), nullable=False, default=u"active")
     unban_date = Column(DateTime)
     email_address = Column(EmailAddress)
-    email_verified = Column(Boolean, default=False)
+    email_verified = Column(Boolean)
     timezone = Column(Unicode(255), nullable=False, default="UTC")
 
     def __repr__(self):
@@ -55,7 +55,7 @@ class User(Base):
     def set_password(self, password):
         if not password:
             raise ValueError("Password can't be blank.")
-        self.password = hashpw(password.encode("utf8"), gensalt())
+        self.password = hashpw(password.encode("utf8"), gensalt()).decode()
 
     def check_password(self, password):
         if not self.password:
