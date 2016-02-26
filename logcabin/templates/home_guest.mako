@@ -14,11 +14,11 @@
 </ul>
 % endif
 
-% if "user_id" in request.session:
+% if request.user:
 
 <section id="account_forms">
   <form action="${request.route_path("account.log_out")}" method="post">
-    <p>Logged in.</p>
+    <p>Logged in as ${request.user.username}.</p>
     <p><button type="submit">Log out</button></p>
   </form>
 </section>
