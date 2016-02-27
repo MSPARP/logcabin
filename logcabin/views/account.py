@@ -1,4 +1,5 @@
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
+from pyramid.security import forget, remember
 from pyramid.view import view_config
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
@@ -71,7 +72,7 @@ def log_in(request):
         return referer_with_flash(request, "There isn't an account called %s." % username)
 
     if user.check_password(request.POST["password"]):
-        request.session["user_id"] = user.id
+        remember(request, user.id)
         return referer_with_flash(request, "Welcome to Log Cabin!")
 
     return referer_with_flash(request, "That's the wrong password.")
@@ -79,6 +80,7 @@ def log_in(request):
 
 @view_config(route_name="account.log_out", request_method="POST")
 def log_out(request):
+    forget(request)
     request.session.invalidate()
     request.session.flash("we'll miss u :'(")
     return HTTPFound(request.route_path("home"))

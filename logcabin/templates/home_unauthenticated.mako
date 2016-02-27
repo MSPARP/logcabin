@@ -1,6 +1,6 @@
 <%inherit file="base.mako" />
 <%block name="title">Welcome to </%block>
-<%block name="body_class">home</%block>
+<%block name="body_class">unauthenticated</%block>
 <% from logcabin.models import User %>
 
 <h1>Log Cabin</h1>
@@ -14,15 +14,6 @@
 </ul>
 % endif
 
-% if request.user:
-
-<section id="account_forms">
-  <form action="${request.route_path("account.log_out")}" method="post">
-    <p>Logged in as ${request.user.username}.</p>
-    <p><button type="submit">Log out</button></p>
-  </form>
-</section>
-% else:
 <section id="account_forms">
   <form action="${request.route_path("account.register")}" method="post">
     <h3>Register</h3>
@@ -39,4 +30,3 @@
     <p class="controls"><button type="submit">Log in</button></p>
   </form>
 </section>
-% endif
