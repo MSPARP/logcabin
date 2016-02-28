@@ -23,7 +23,10 @@ from zope.sqlalchemy import ZopeTransactionExtension
 
 from logcabin.models.types import URLSegment, EmailAddress
 
-Session = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+Session = scoped_session(sessionmaker(
+    extension=ZopeTransactionExtension(),
+    expire_on_commit=False,
+))
 Base = declarative_base()
 
 
@@ -48,6 +51,12 @@ class User(Base):
     email_address = Column(EmailAddress)
     email_verified = Column(Boolean)
     timezone = Column(Unicode(255), nullable=False, default="UTC")
+
+    @property
+    def unban_delta(self):
+        if not unban_date:
+            return None
+        return self.unban_date - datetime.datetime.now()
 
     def __repr__(self):
         return "<User #{}: {}>".format(self.id, self.username)

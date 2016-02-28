@@ -1,3 +1,6 @@
+import datetime
+import transaction
+
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.config import Configurator
 from pyramid.authentication import Authenticated, Everyone
@@ -10,11 +13,25 @@ from logcabin.models import Base, Session, User
 def request_user(request):
     if not request.unauthenticated_userid:
         return None
+
     try:
-        return Session.query(User).filter(User.id == request.unauthenticated_userid).one()
+        user = Session.query(User).filter(User.id == request.unauthenticated_userid).one()
     except NoResultFound:
-        pass
-    return None
+        return None
+
+    user.last_online = datetime.datetime.now()
+    user.last_ip = request.environ["REMOTE_ADDR"]
+    if user.status == "banned" and user.unban_date is not None:
+        if user.unban_delta.total_seconds() < 0:
+            user.unban_date = None
+            user.status = "active"
+    # The ACL stuff means the user object belongs to a different
+    # transaction to the rest of the request, so we have to manually
+    # commit it here (and set the Session to not expire on commit).
+    # TODO consider not using scoped_session and just making the Session a request property
+    transaction.commit()
+
+    return user
 
 
 def authentication_callback(userid, request):
