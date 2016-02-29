@@ -9,5 +9,7 @@
 
 ${next.body()}
 
+<script src="/static/logcabin.js"></script>
+
 </body>
 </html>
