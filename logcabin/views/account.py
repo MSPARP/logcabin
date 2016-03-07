@@ -66,7 +66,7 @@ def register(request):
     Session.add(new_user)
     Session.flush()
 
-    request.session["user_id"] = new_user.id
+    remember(request, new_user.id)
     return success_response(request, "Welcome to Log Cabin!")
 
 
@@ -91,7 +91,6 @@ def log_in(request):
 @view_config(route_name="account.log_out", request_method="POST")
 def log_out(request):
     forget(request)
-    request.session.invalidate()
     request.session.flash("we'll miss u :'(")
     return HTTPFound(request.route_path("home"))
 

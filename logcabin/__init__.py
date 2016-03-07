@@ -10,6 +10,26 @@ from sqlalchemy.orm.exc import NoResultFound
 from logcabin.models import Base, Session, User
 
 
+class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
+    def callback(self, userid, request):
+        if not request.user:
+            return None
+        return {
+            "banned": ("banned",),
+            "guest": (),
+            "active": ("active",),
+        }[request.user.status]
+
+    def remember(self, request, userid, **kwargs):
+        request.session.adjust_timeout_for_session(2592000)
+        return super().remember(request, userid, **kwargs)
+
+    def forget(self, request):
+        ret = super().forget(request)
+        request.session.invalidate()
+        return ret
+
+
 def request_user(request):
     if not request.unauthenticated_userid:
         return None
@@ -34,16 +54,6 @@ def request_user(request):
     return user
 
 
-def authentication_callback(userid, request):
-    if not request.user:
-        return None
-    return {
-        "banned": ("banned",),
-        "guest": (),
-        "active": ("active",),
-    }[request.user.status]
-
-
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
@@ -52,7 +62,7 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
     config = Configurator(
         settings=settings,
-        authentication_policy=SessionAuthenticationPolicy(callback=authentication_callback),
+        authentication_policy=LogCabinAuthenticationPolicy(),
     )
     config.include("pyramid_mako")
 
