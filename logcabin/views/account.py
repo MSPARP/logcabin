@@ -94,3 +94,27 @@ def log_out(request):
     request.session.flash("we'll miss u :'(")
     return HTTPFound(request.route_path("home"))
 
+
+@view_config(route_name="account.settings", request_method="GET", renderer="account/settings.mako")
+def settings(request):
+    return {}
+
+
+@view_config(route_name="account.change_password", request_method="POST", renderer="json")
+def change_password(request):
+    if (
+        not request.POST.get("old_password")
+        or not request.POST.get("new_password")
+        or not request.POST.get("new_password_again")
+    ):
+        return error_response(request, "Please fill in all the fields.")
+
+    if request.POST["new_password"] != request.POST["new_password_again"]:
+        return error_response(request, "Those passwords didn't match.")
+
+    if not request.user.check_password(request.POST["old_password"]):
+        return error_response(request, "That's the wrong password.")
+
+    request.user.set_password(request.POST["new_password"])
+    return success_response(request, "Your password has been changed.")
+
