@@ -115,6 +115,8 @@ def change_password(request):
     if not request.user.check_password(request.POST["old_password"]):
         return error_response(request, "That's the wrong password.")
 
-    request.user.set_password(request.POST["new_password"])
+    # request.user doesn't belong to this session, so we can't update it.
+    user = Session.query(User).filter(User.id == request.user.id).one()
+    user.set_password(request.POST["new_password"])
     return success_response(request, "Your password has been changed.")
 
