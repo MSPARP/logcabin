@@ -5,6 +5,7 @@ from sqlalchemy import (
     func,
     CheckConstraint,
     Column,
+    ForeignKey,
     Index,
     Boolean,
     DateTime,
@@ -74,4 +75,24 @@ class User(Base):
 
 Index("users_username", func.lower(User.username), unique=True)
 Index("users_email_address", func.lower(User.email_address), unique=True)
+
+
+class Log(Base):
+    __tablename__ = "logs"
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode(100), nullable=False)
+    creator = Column(Integer, ForeignKey(User.id), nullable=False)
+    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+
+
+class Chapter(Base):
+    __tablename__ = "chapters"
+    id = Column(Integer, primary_key=True)
+    log_id = Column(Integer, ForeignKey(Log.id), nullable=False)
+    number = Column(Integer, nullable=False)
+    name = Column(Unicode(100), nullable=False)
+    creator = Column(Integer, ForeignKey(User.id), nullable=False)
+    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
