@@ -1,7 +1,12 @@
-<%inherit file="base.mako" />
-<%block name="title">Welcome to </%block>
-<%block name="body_class">unauthenticated</%block>
+<!DOCTYPE html>
 <% from logcabin.models import User %>
+<html>
+<head>
+<title>Welcome to Log Cabin</title>
+<link rel="stylesheet" href="/static/normalize.css">
+<link rel="stylesheet" href="/static/logcabin.css">
+</head>
+<body class="unauthenticated">
 
 <h1>Log Cabin</h1>
 
@@ -32,3 +37,8 @@
     <p class="controls"><button type="submit">Log in</button></p>
   </form>
 </section>
+
+<script src="/static/logcabin.js"></script>
+
+</body>
+</html>
