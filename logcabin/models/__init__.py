@@ -1,6 +1,7 @@
 import datetime
 
 from bcrypt import gensalt, hashpw
+from pyramid.security import Allow, Authenticated, Everyone
 from sqlalchemy import (
     func,
     CheckConstraint,
@@ -32,7 +33,14 @@ Session = scoped_session(sessionmaker(
 Base = declarative_base()
 
 
-class User(Base):
+class Resource(object):
+    __acl__ = (
+        (Allow, Authenticated, "view"),
+        (Allow, "admin", "admin"),
+    )
+
+
+class User(Base, Resource):
     __tablename__ = "users"
     __table_args__ = (
         CheckConstraint("""

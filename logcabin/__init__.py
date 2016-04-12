@@ -8,6 +8,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
 from logcabin.models import Base, Session, User
+from logcabin.resources import get_user
 
 
 class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
@@ -77,6 +78,11 @@ def main(global_config, **settings):
     config.add_route("account.log_out", "/account/log_out")
     config.add_route("account.settings", "/account/settings")
     config.add_route("account.change_password", "/account/change_password")
+
+    config.add_route("users.profile", "/users/{username}", factory=get_user)
+    config.add_route("users.logs", "/users/{username}/logs", factory=get_user)
+    config.add_route("users.favourites", "/users/{username}/favourites", factory=get_user)
+    config.add_route("users.subscriptions", "/users/{username}/subscriptions", factory=get_user)
 
     config.scan()
     return config.make_wsgi_app()
