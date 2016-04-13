@@ -90,7 +90,7 @@ class Log(Base):
     __tablename__ = "logs"
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(100), nullable=False)
-    creator = Column(Integer, ForeignKey(User.id), nullable=False)
+    creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
@@ -103,7 +103,7 @@ class Chapter(Base):
     log_id = Column(Integer, ForeignKey(Log.id), nullable=False)
     number = Column(Integer, nullable=False)
     name = Column(Unicode(100), nullable=False)
-    creator = Column(Integer, ForeignKey(User.id), nullable=False)
+    creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
@@ -121,12 +121,12 @@ LogSubscription.user = relationship(User, backref="log_subscriptions")
 LogSubscription.log = relationship(Log, backref="subscribers")
 
 
-class Favourite(Base):
-    __tablename__ = "favourites"
+class Favorite(Base):
+    __tablename__ = "favorites"
     user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
     log_id = Column(Integer, ForeignKey(Log.id), primary_key=True)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
-Favourite.user = relationship(User, backref="favourites")
-Favourite.log = relationship(Log, backref="favourites")
+Favorite.user = relationship(User, backref="favorites")
+Favorite.log = relationship(Log, backref="favorites")
 
