@@ -9,6 +9,7 @@
   <li><a href="${request.route_path("logs.log", id=log.id)}">${log.name}</a></li>
   % endfor
 </ul>
+<p><a href="${request.route_path("users.logs", username=request.context.username)}">More</a></p>
 
 <h2>Favorites</h2>
 <ul>
@@ -16,6 +17,7 @@
   <li><a href="${request.route_path("logs.log", id=favorite.log.id)}">${favorite.log.name}</a></li>
   % endfor
 </ul>
+<p><a href="${request.route_path("users.favorites", username=request.context.username)}">More</a></p>
 
 <h2>Subscribed to</h2>
 <ul>
@@ -23,4 +25,5 @@
   <li><a href="${request.route_path("logs.log", id=subscription.log.id)}">${subscription.log.name}</a></li>
   % endfor
 </ul>
+<p><a href="${request.route_path("users.subscriptions", username=request.context.username)}">More</a></p>
 
