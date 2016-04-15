@@ -1,14 +1,40 @@
 import datetime
 import transaction
 
-from pyramid.authentication import SessionAuthenticationPolicy
+from pyramid.authentication import Authenticated, Everyone, SessionAuthenticationPolicy
 from pyramid.config import Configurator
-from pyramid.authentication import Authenticated, Everyone
+from pyramid.httpexceptions import HTTPFound
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
 from logcabin.models import Base, Session, User
 from logcabin.resources import get_user
+
+
+class ExtensionPredicate(object):
+    def __init__(self, extension, config):
+        self.extension = extension
+
+    def text(self):
+        return "extension == %s" % self.extension
+
+    phash = text
+
+    def __call__(self, context, request):
+        # Redirect to no extension if extension is html.
+        if request.matchdict["ext"] == "html":
+            del request.matchdict["ext"]
+            plain_route = request.matched_route.name.split(".ext")[0]
+            raise HTTPFound(request.route_path(plain_route, **request.matchdict))
+        return request.matchdict["ext"] == self.extension
+
+
+class LogCabinConfigurator(Configurator):
+    def add_ext_route(self, name, pattern, **kwargs):
+        self.add_route(name, pattern, **kwargs)
+        ext_name = name + ".ext"
+        ext_pattern = pattern + ".{ext}"
+        self.add_route(ext_name, ext_pattern, **kwargs)
 
 
 class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
@@ -61,13 +87,15 @@ def main(global_config, **settings):
     engine = engine_from_config(settings, "sqlalchemy.")
     Session.configure(bind=engine)
     Base.metadata.bind = engine
-    config = Configurator(
+    config = LogCabinConfigurator(
         settings=settings,
         authentication_policy=LogCabinAuthenticationPolicy(),
     )
     config.include("pyramid_mako")
 
     config.add_request_method(request_user, 'user', reify=True)
+
+    config.add_view_predicate("extension", ExtensionPredicate)
 
     config.add_static_view("static", "static", cache_max_age=3600)
 
@@ -80,9 +108,9 @@ def main(global_config, **settings):
     config.add_route("account.change_password", "/account/change_password")
 
     config.add_route("users.profile", "/users/{username}", factory=get_user)
-    config.add_route("users.logs", "/users/{username}/logs", factory=get_user)
-    config.add_route("users.favorites", "/users/{username}/favorites", factory=get_user)
-    config.add_route("users.subscriptions", "/users/{username}/subscriptions", factory=get_user)
+    config.add_ext_route("users.logs", "/users/{username}/logs", factory=get_user)
+    config.add_ext_route("users.favorites", "/users/{username}/favorites", factory=get_user)
+    config.add_ext_route("users.subscriptions", "/users/{username}/subscriptions", factory=get_user)
 
     config.add_route("logs.log", "/logs/{id}")
 

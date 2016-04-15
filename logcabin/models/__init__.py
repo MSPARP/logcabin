@@ -71,6 +71,12 @@ class User(Base, Resource):
     def __repr__(self):
         return "<User #{}: {}>".format(self.id, self.username)
 
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "username": self.username,
+        }
+
     def set_password(self, password):
         if not password:
             raise ValueError("Password can't be blank.")
@@ -93,6 +99,18 @@ class Log(Base):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+
+    def __repr__(self):
+        return "<Log #{}: {}>".format(self.id, self.name)
+
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "creator": self.creator,
+            "created": self.created.isoformat(),
+            "last_modified": self.last_modified.isoformat(),
+        }
 
 Log.creator = relationship(User, backref="logs_created")
 
@@ -117,6 +135,13 @@ class LogSubscription(Base):
     log_id = Column(Integer, ForeignKey(Log.id), primary_key=True)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
+    def __json__(self, request=None):
+        return {
+            "user": self.user,
+            "log": self.log,
+            "created": self.created.isoformat(),
+        }
+
 LogSubscription.user = relationship(User, backref="log_subscriptions")
 LogSubscription.log = relationship(Log, backref="subscribers")
 
@@ -126,6 +151,13 @@ class Favorite(Base):
     user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
     log_id = Column(Integer, ForeignKey(Log.id), primary_key=True)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
+
+    def __json__(self, request=None):
+        return {
+            "user": self.user,
+            "log": self.log,
+            "created": self.created.isoformat(),
+        }
 
 Favorite.user = relationship(User, backref="favorites")
 Favorite.log = relationship(Log, backref="favorites")

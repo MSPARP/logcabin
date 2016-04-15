@@ -11,38 +11,40 @@ def users_profile(context, request):
             Session.query(Log)
             .filter(Log.creator_id == context.id)
             .order_by(Log.last_modified.desc())
-            .limit(10)
+            .limit(10).all()
         ),
         "favorites": (
             Session.query(Favorite)
             .filter(Favorite.user_id == context.id)
             .order_by(Favorite.created.desc())
             .options(joinedload(Favorite.log).joinedload(Log.creator))
-            .limit(10)
+            .limit(10).all()
         ),
         "log_subscriptions": (
             Session.query(LogSubscription)
             .filter(LogSubscription.user_id == context.id)
             .order_by(LogSubscription.created.desc())
             .options(joinedload(LogSubscription.log).joinedload(Log.creator))
-            .limit(10)
+            .limit(10).all()
         ),
     }
 
 
 @view_config(route_name="users.logs", renderer="users/logs.mako")
+@view_config(route_name="users.logs.ext", extension="json", renderer="json")
 def users_logs(context, request):
     return {
         "recent_logs": (
             Session.query(Log)
             .filter(Log.creator_id == context.id)
             .order_by(Log.last_modified.desc())
-            .limit(25)
+            .limit(25).all()
         ),
     }
 
 
 @view_config(route_name="users.favorites", renderer="users/favorites.mako")
+@view_config(route_name="users.favorites.ext", extension="json", renderer="json")
 def users_favorites(context, request):
     return {
         "favorites": (
@@ -50,12 +52,13 @@ def users_favorites(context, request):
             .filter(Favorite.user_id == context.id)
             .order_by(Favorite.created.desc())
             .options(joinedload(Favorite.log).joinedload(Log.creator))
-            .limit(25)
+            .limit(25).all()
         ),
     }
 
 
 @view_config(route_name="users.subscriptions", renderer="users/subscriptions.mako")
+@view_config(route_name="users.subscriptions.ext", extension="json", renderer="json")
 def users_subscriptions(context, request):
     return {
         "log_subscriptions": (
@@ -63,7 +66,7 @@ def users_subscriptions(context, request):
             .filter(LogSubscription.user_id == context.id)
             .order_by(LogSubscription.created.desc())
             .options(joinedload(LogSubscription.log).joinedload(Log.creator))
-            .limit(25)
+            .limit(25).all()
         ),
     }
 
