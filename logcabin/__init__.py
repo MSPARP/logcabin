@@ -97,6 +97,9 @@ def main(global_config, **settings):
 
     config.add_view_predicate("extension", ExtensionPredicate)
 
+    config.add_renderer("json", "logcabin.renderers.JSONRenderer")
+    config.add_renderer("yaml", "logcabin.renderers.YAMLRenderer")
+
     config.add_static_view("static", "static", cache_max_age=3600)
 
     config.add_route("home", "/")

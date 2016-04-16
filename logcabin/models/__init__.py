@@ -108,8 +108,8 @@ class Log(Base):
             "id": self.id,
             "name": self.name,
             "creator": self.creator,
-            "created": self.created.isoformat(),
-            "last_modified": self.last_modified.isoformat(),
+            "created": self.created,
+            "last_modified": self.last_modified,
         }
 
 Log.creator = relationship(User, backref="logs_created")
@@ -139,7 +139,7 @@ class LogSubscription(Base):
         return {
             "user": self.user,
             "log": self.log,
-            "created": self.created.isoformat(),
+            "created": self.created,
         }
 
 LogSubscription.user = relationship(User, backref="log_subscriptions")
@@ -156,7 +156,7 @@ class Favorite(Base):
         return {
             "user": self.user,
             "log": self.log,
-            "created": self.created.isoformat(),
+            "created": self.created,
         }
 
 Favorite.user = relationship(User, backref="favorites")

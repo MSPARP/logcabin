@@ -32,6 +32,7 @@ def users_profile(context, request):
 
 @view_config(route_name="users.logs", renderer="users/logs.mako")
 @view_config(route_name="users.logs.ext", extension="json", renderer="json")
+@view_config(route_name="users.logs.ext", extension="yaml", renderer="yaml")
 def users_logs(context, request):
     return {
         "recent_logs": (
@@ -45,6 +46,7 @@ def users_logs(context, request):
 
 @view_config(route_name="users.favorites", renderer="users/favorites.mako")
 @view_config(route_name="users.favorites.ext", extension="json", renderer="json")
+@view_config(route_name="users.favorites.ext", extension="yaml", renderer="yaml")
 def users_favorites(context, request):
     return {
         "favorites": (
@@ -59,6 +61,7 @@ def users_favorites(context, request):
 
 @view_config(route_name="users.subscriptions", renderer="users/subscriptions.mako")
 @view_config(route_name="users.subscriptions.ext", extension="json", renderer="json")
+@view_config(route_name="users.subscriptions.ext", extension="yaml", renderer="yaml")
 def users_subscriptions(context, request):
     return {
         "log_subscriptions": (
