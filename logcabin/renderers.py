@@ -1,6 +1,8 @@
 from camel import Camel, CamelRegistry
 from datetime import datetime
+from feedgen.feed import FeedGenerator
 from pyramid.renderers import JSON
+from pytz import utc
 
 from logcabin.models import User, Log, LogSubscription, Favorite
 
@@ -18,11 +20,27 @@ camel = Camel([camel_registry])
 
 class YAMLRenderer(object):
     def __init__(self, info):
-        print("info", info)
+        pass
 
     def __call__(self, value, system):
-        print("value", value)
-        print("system", system)
         system["request"].response.headers["Content-type"] = "application/yaml; charset=UTF-8"
         return camel.dump(value)
+
+
+class FeedRenderer(object):
+    def __init__(self, info):
+        pass
+
+    def __call__(self, value, system):
+        feed = FeedGenerator()
+        feed.title(value["title"])
+        feed.description("Log Cabin")
+        feed.link(rel="self", href=system["request"].url)
+        feed.language("en")
+        for item in value["items"]:
+            entry = feed.add_entry()
+            # TODO custom object -> entry converters
+            entry.title(item.name)
+            entry.published(utc.localize(item.created))
+        return feed.rss_str()
 

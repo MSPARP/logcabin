@@ -1,9 +1,12 @@
 bcrypt==2.0.0
+camel==0.1
+feedgen==0.3.2
 pyramid==1.6
 pyramid_chameleon==0.3
 pyramid_debugtoolbar==2.4.2
 pyramid_redis_sessions==1.0.1
 pyramid_tm==0.12.1
+pytz==2016.3
 SQLAlchemy==1.0.11
 transaction==1.4.4
 waitress==0.8.10

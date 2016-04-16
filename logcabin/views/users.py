@@ -33,15 +33,22 @@ def users_profile(context, request):
 @view_config(route_name="users.logs", renderer="users/logs.mako")
 @view_config(route_name="users.logs.ext", extension="json", renderer="json")
 @view_config(route_name="users.logs.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="users.logs.ext", extension="rss", renderer="rss")
 def users_logs(context, request):
-    return {
-        "recent_logs": (
-            Session.query(Log)
-            .filter(Log.creator_id == context.id)
-            .order_by(Log.last_modified.desc())
-            .limit(25).all()
-        ),
-    }
+    recent_logs = (
+        Session.query(Log)
+        .filter(Log.creator_id == context.id)
+        .order_by(Log.last_modified.desc())
+        .limit(25).all()
+    )
+
+    if request.matchdict.get("ext") == "rss":
+        return {
+            "title": "%s's logs" % context.username,
+            "items": recent_logs,
+        }
+
+    return {"recent_logs": recent_logs}
 
 
 @view_config(route_name="users.favorites", renderer="users/favorites.mako")
