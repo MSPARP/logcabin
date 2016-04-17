@@ -34,6 +34,7 @@ def users_profile(context, request):
 @view_config(route_name="users.logs.ext", extension="json", renderer="json")
 @view_config(route_name="users.logs.ext", extension="yaml", renderer="yaml")
 @view_config(route_name="users.logs.ext", extension="rss", renderer="rss")
+@view_config(route_name="users.logs.ext", extension="atom", renderer="atom")
 def users_logs(context, request):
     recent_logs = (
         Session.query(Log)
@@ -42,7 +43,7 @@ def users_logs(context, request):
         .limit(25).all()
     )
 
-    if request.matchdict.get("ext") == "rss":
+    if request.matchdict.get("ext") in ("rss", "atom"):
         return {
             "title": "%s's logs" % context.username,
             "items": recent_logs,

@@ -32,15 +32,26 @@ class FeedRenderer(object):
         pass
 
     def __call__(self, value, system):
+
         feed = FeedGenerator()
+        feed.id(system["request"].url)
         feed.title(value["title"])
         feed.description("Log Cabin")
         feed.link(rel="self", href=system["request"].url)
         feed.language("en")
+
         for item in value["items"]:
             entry = feed.add_entry()
             # TODO custom object -> entry converters
+            entry.id(item.name)
             entry.title(item.name)
+            entry.content(item.name)
             entry.published(utc.localize(item.created))
-        return feed.rss_str()
+
+        if system["renderer_name"] == "rss":
+            system["request"].response.headers["Content-type"] = "application/rss+xml; charset=UTF-8"
+            return feed.rss_str()
+        else:
+            system["request"].response.headers["Content-type"] = "application/atom+xml; charset=UTF-8"
+            return feed.atom_str()
 

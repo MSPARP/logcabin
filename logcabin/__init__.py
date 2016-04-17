@@ -100,6 +100,7 @@ def main(global_config, **settings):
     config.add_renderer("json", "logcabin.renderers.JSONRenderer")
     config.add_renderer("yaml", "logcabin.renderers.YAMLRenderer")
     config.add_renderer("rss", "logcabin.renderers.FeedRenderer")
+    config.add_renderer("atom", "logcabin.renderers.FeedRenderer")
 
     config.add_static_view("static", "static", cache_max_age=3600)
 
