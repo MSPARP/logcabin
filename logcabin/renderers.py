@@ -40,13 +40,8 @@ class FeedRenderer(object):
         feed.link(rel="self", href=system["request"].url)
         feed.language("en")
 
-        for item in value["items"]:
-            entry = feed.add_entry()
-            # TODO custom object -> entry converters
-            entry.id(item.name)
-            entry.title(item.name)
-            entry.content(item.name)
-            entry.published(utc.localize(item.created))
+        for entry in value["entries"]:
+            feed.add_entry(entry)
 
         if system["renderer_name"] == "rss":
             system["request"].response.headers["Content-type"] = "application/rss+xml; charset=UTF-8"
