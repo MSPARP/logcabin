@@ -45,8 +45,8 @@ class FeedRenderer(object):
 
         if system["renderer_name"] == "rss":
             system["request"].response.headers["Content-type"] = "application/rss+xml; charset=UTF-8"
-            return feed.rss_str()
+            return feed.rss_str(pretty=True)
         else:
             system["request"].response.headers["Content-type"] = "application/atom+xml; charset=UTF-8"
-            return feed.atom_str()
+            return feed.atom_str(pretty=True)
 

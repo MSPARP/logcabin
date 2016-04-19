@@ -81,6 +81,45 @@ def request_user(request):
     return user
 
 
+extension_content_types = {
+    "json": "application/json",
+    "yaml": "application/yaml",
+    "rss": "application/rss+xml",
+    "atom": "application/atom+xml",
+}
+
+
+def request_extensions(request):
+    if not request.matched_route:
+        return []
+
+    extension_route = (
+        request.matched_route.name if request.matched_route.name.endswith(".ext")
+        else request.matched_route.name + ".ext"
+    )
+    route_introspectable = request.registry.introspector.get("routes", extension_route)
+    if not route_introspectable:
+        return []
+
+    extensions = []
+
+    if "ext" in request.matchdict:
+        matchdict = dict(request.matchdict)
+        del matchdict["ext"]
+    else:
+        matchdict = request.matchdict
+
+    for route in request.registry.introspector.related(route_introspectable):
+        if "extension" not in route or route["extension"] == request.matchdict.get("ext"):
+            continue
+        extensions.append((
+            extension_content_types[route["extension"]],
+            request.route_url(extension_route, ext=route["extension"], **matchdict),
+        ))
+
+    return extensions
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
@@ -94,6 +133,7 @@ def main(global_config, **settings):
     config.include("pyramid_mako")
 
     config.add_request_method(request_user, 'user', reify=True)
+    config.add_request_method(request_extensions, 'extensions', reify=True)
 
     config.add_view_predicate("extension", ExtensionPredicate)
 

@@ -4,6 +4,9 @@
 <title><%block name="title"></%block>Log Cabin</title>
 <link rel="stylesheet" href="/static/normalize.css">
 <link rel="stylesheet" href="/static/logcabin.css">
+% for content_type, url in request.extensions:
+<link rel="alternate" type="${content_type}" href="${url}">
+% endfor
 </head>
 <body class="<%block name="body_class"></%block>">
 
