@@ -25,6 +25,7 @@ from sqlalchemy.orm import (
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from logcabin.models.types import URLSegment, EmailAddress
+from logcabin.lib.formats import camel_registry
 
 Session = scoped_session(sessionmaker(
     extension=ZopeTransactionExtension(),
@@ -88,6 +89,8 @@ class User(Base, Resource):
         return hashpw(password.encode("utf8"), self.password.encode()) == self.password.encode()
 
 
+camel_registry.dumper(User, "user", version=None)(User.__json__)
+
 Index("users_username", func.lower(User.username), unique=True)
 Index("users_email_address", func.lower(User.email_address), unique=True)
 
@@ -111,6 +114,8 @@ class Log(Base):
             "created": self.created,
             "last_modified": self.last_modified,
         }
+
+camel_registry.dumper(Log, "log", version=None)(Log.__json__)
 
 Log.creator = relationship(User, backref="logs_created")
 
@@ -142,6 +147,8 @@ class LogSubscription(Base):
             "created": self.created,
         }
 
+camel_registry.dumper(LogSubscription, "log_subscription", version=None)(LogSubscription.__json__)
+
 LogSubscription.user = relationship(User, backref="log_subscriptions")
 LogSubscription.log = relationship(Log, backref="subscribers")
 
@@ -158,6 +165,8 @@ class Favorite(Base):
             "log": self.log,
             "created": self.created,
         }
+
+camel_registry.dumper(Favorite, "favorite", version=None)(Favorite.__json__)
 
 Favorite.user = relationship(User, backref="favorites")
 Favorite.log = relationship(Log, backref="favorites")
