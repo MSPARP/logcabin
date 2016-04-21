@@ -34,6 +34,12 @@ class FeedRenderer(object):
         feed.link(rel="self", href=system["request"].url)
         feed.language("en")
 
+        if system["renderer_name"] == "atom":
+            feed.link([
+                {"rel": "alternate", "type": content_type, "href": url}
+                for content_type, url in system["request"].extensions
+            ])
+
         for entry in value["entries"]:
             feed.add_entry(entry)
 
