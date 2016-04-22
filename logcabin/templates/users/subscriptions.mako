@@ -5,7 +5,12 @@
 
 <ul>
   % for subscription in log_subscriptions:
-  <li><a href="${request.route_path("logs.log", id=subscription.log.id)}">${subscription.log.name}</a></li>
+  <li>
+    <a href="${request.route_path("logs.log", id=subscription.log.id)}">${subscription.log.name}</a>
+    % if subscription.log.summary:
+    <p>${subscription.log.summary}</p>
+    % endif
+  </li>
   % endfor
 </ul>
 

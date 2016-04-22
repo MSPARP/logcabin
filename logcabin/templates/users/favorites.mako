@@ -5,7 +5,12 @@
 
 <ul>
   % for favorite in favorites:
-  <li><a href="${request.route_path("logs.log", id=favorite.log.id)}">${favorite.log.name}</a></li>
+  <li>
+    <a href="${request.route_path("logs.log", id=favorite.log.id)}">${favorite.log.name}</a>
+    % if favorite.log.summary:
+    <p>${favorite.log.summary}</p>
+    % endif
+  </li>
   % endfor
 </ul>
 

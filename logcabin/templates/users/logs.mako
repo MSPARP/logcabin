@@ -5,7 +5,12 @@
 
 <ul>
   % for log in recent_logs:
-  <li><a href="${request.route_path("logs.log", id=log.id)}">${log.name}</a></li>
+  <li>
+    <a href="${request.route_path("logs.log", id=log.id)}">${log.name}</a>
+    % if log.summary:
+    <p>${log.summary}</p>
+    % endif
+  </li>
   % endfor
 </ul>
 

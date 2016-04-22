@@ -59,7 +59,7 @@ def users_logs_feed(context, request):
         entry = FeedEntry()
         entry.id(str(log.id))
         entry.title(log.name)
-        entry.content(log.name)
+        entry.content(log.summary or "No summary.")
         entry.published(utc.localize(log.created))
         entries.append(entry)
 
@@ -98,7 +98,7 @@ def users_favorites_feed(context, request):
         entry = FeedEntry()
         entry.id(str(favorite.log.id))
         entry.title("%s favorited %s." % (context.username, favorite.log.name))
-        entry.content("%s favorited %s." % (context.username, favorite.log.name))
+        entry.content(favorite.log.summary or "No summary.")
         entry.published(utc.localize(favorite.created))
         entries.append(entry)
 
@@ -137,7 +137,7 @@ def users_subscriptions_feed(context, request):
         entry = FeedEntry()
         entry.id(str(subscription.log.id))
         entry.title("%s subscribed to %s." % (context.username, subscription.log.name))
-        entry.content("%s subscribed to %s." % (context.username, subscription.log.name))
+        entry.content(subscription.log.summary or "No summary.")
         entry.published(utc.localize(subscription.created))
         entries.append(entry)
 

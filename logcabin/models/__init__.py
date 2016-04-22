@@ -102,6 +102,7 @@ class Log(Base):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    summary = Column(Unicode(255))
 
     def __repr__(self):
         return "<Log #{}: {}>".format(self.id, self.name)
@@ -113,6 +114,7 @@ class Log(Base):
             "creator": self.creator,
             "created": self.created,
             "last_modified": self.last_modified,
+            "summary": self.summary,
         }
 
 camel_registry.dumper(Log, "log", version=None)(Log.__json__)
