@@ -8,7 +8,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
 from logcabin.models import Base, Session, User
-from logcabin.resources import get_user
+from logcabin.resources import get_user, get_log, get_chapter
 
 
 class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
@@ -86,7 +86,9 @@ def main(global_config, **settings):
     config.add_ext_route("users.favorites", "/users/{username}/favorites", factory=get_user)
     config.add_ext_route("users.subscriptions", "/users/{username}/subscriptions", factory=get_user)
 
-    config.add_route("logs.log", "/logs/{id}")
+    config.add_ext_route("logs.log", "/logs/{log_id}", factory=get_log)
+    config.add_ext_route("logs.chapters", "/logs/{log_id}/chapters", factory=get_log)
+    config.add_ext_route("logs.chapter", "/logs/{log_id}/chapters/{number}", factory=get_chapter)
 
     config.scan()
     return config.make_wsgi_app()
