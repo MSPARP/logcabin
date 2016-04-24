@@ -86,9 +86,9 @@ def main(global_config, **settings):
     config.add_ext_route("users.favorites", "/users/{username}/favorites", factory=get_user)
     config.add_ext_route("users.subscriptions", "/users/{username}/subscriptions", factory=get_user)
 
-    config.add_ext_route("logs.log", "/logs/{log_id}", factory=get_log)
-    config.add_ext_route("logs.chapters", "/logs/{log_id}/chapters", factory=get_log)
-    config.add_ext_route("logs.chapter", "/logs/{log_id}/chapters/{number}", factory=get_chapter)
+    config.add_ext_route("logs.log", "/logs/{log_id:\d+}", factory=get_log)
+    config.add_ext_route("logs.chapters", "/logs/{log_id:\d+}/chapters", factory=get_log)
+    config.add_ext_route("logs.chapter", "/logs/{log_id:\d+}/chapters/{number}", factory=get_chapter)
 
     config.scan()
     return config.make_wsgi_app()

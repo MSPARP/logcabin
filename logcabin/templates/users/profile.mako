@@ -7,7 +7,7 @@
 <ul>
   % for log in recent_logs:
   <li>
-    <a href="${request.route_path("logs.log", id=log.id)}">${log.name}</a>
+    <a href="${request.route_path("logs.log", log_id=log.id)}">${log.name}</a>
     % if log.summary:
     <p>${log.summary}</p>
     % endif
@@ -20,7 +20,7 @@
 <ul>
   % for favorite in favorites:
   <li>
-    <a href="${request.route_path("logs.log", id=favorite.log.id)}">${favorite.log.name}</a>
+    <a href="${request.route_path("logs.log", log_id=favorite.log.id)}">${favorite.log.name}</a>
     % if favorite.log.summary:
     <p>${favorite.log.summary}</p>
     % endif
@@ -33,7 +33,7 @@
 <ul>
   % for subscription in log_subscriptions:
   <li>
-    <a href="${request.route_path("logs.log", id=subscription.log.id)}">${subscription.log.name}</a>
+    <a href="${request.route_path("logs.log", log_id=subscription.log.id)}">${subscription.log.name}</a>
     % if subscription.log.summary:
     <p>${subscription.log.summary}</p>
     % endif

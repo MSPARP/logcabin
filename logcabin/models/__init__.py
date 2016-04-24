@@ -132,6 +132,19 @@ class Chapter(Base):
     created = Column(DateTime, nullable=False, default=datetime.datetime.now)
     last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
 
+    def __repr__(self):
+        return "<Chapter #{}: {}>".format(self.id, self.name)
+
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "number": self.number,
+            "name": self.name,
+            "creator": self.creator,
+            "created": self.created,
+            "last_modified": self.last_modified,
+        }
+
 Chapter.Log = relationship(Log, backref="chapters")
 Chapter.creator = relationship(User, backref="chapters_created")
 
