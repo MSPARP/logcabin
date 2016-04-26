@@ -145,8 +145,37 @@ class Chapter(Base):
             "last_modified": self.last_modified,
         }
 
-Chapter.Log = relationship(Log, backref="chapters")
+Chapter.log = relationship(Log, backref="chapters")
 Chapter.creator = relationship(User, backref="chapters_created")
+
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True)
+    chapter_id = Column(Integer, ForeignKey(Chapter.id), nullable=False)
+    number = Column(Integer, nullable=False)
+    creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    text = Column(UnicodeText, nullable=False)
+
+    def __repr__(self):
+        if len(text) > 50:
+            return "<Message #{}: {}>".format(self.id, self.text[:47] + "...")
+        return "<Message #{}: {}>".format(self.id, self.text)
+
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "number": self.number,
+            "creator": self.creator,
+            "created": self.created,
+            "last_modified": self.last_modified,
+            "text": self.text,
+        }
+
+Message.chapter = relationship(Chapter, backref="messages")
+Message.creator = relationship(User, backref="messages_created")
 
 
 class LogSubscription(Base):
