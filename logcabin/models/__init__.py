@@ -14,6 +14,7 @@ from sqlalchemy import (
     Integer,
     String,
     Unicode,
+    UnicodeText,
 )
 from sqlalchemy.dialects.postgresql import INET
 from sqlalchemy.ext.declarative import declarative_base
@@ -145,6 +146,8 @@ class Chapter(Base):
             "last_modified": self.last_modified,
         }
 
+camel_registry.dumper(Chapter, "chapter", version=None)(Chapter.__json__)
+
 Chapter.log = relationship(Log, backref="chapters")
 Chapter.creator = relationship(User, backref="chapters_created")
 
@@ -173,6 +176,8 @@ class Message(Base):
             "last_modified": self.last_modified,
             "text": self.text,
         }
+
+camel_registry.dumper(Message, "message", version=None)(Message.__json__)
 
 Message.chapter = relationship(Chapter, backref="messages")
 Message.creator = relationship(User, backref="messages_created")
