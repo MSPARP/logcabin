@@ -1,6 +1,9 @@
 import datetime
+import markdown
 
 from bcrypt import gensalt, hashpw
+from markupsafe import Markup, escape
+from pyramid.decorator import reify
 from pyramid.security import Allow, Authenticated, Everyone
 from sqlalchemy import (
     func,
@@ -27,6 +30,10 @@ from zope.sqlalchemy import ZopeTransactionExtension
 
 from logcabin.models.types import URLSegment, EmailAddress
 from logcabin.lib.formats import camel_registry
+
+
+md = markdown.Markdown()
+
 
 Session = scoped_session(sessionmaker(
     extension=ZopeTransactionExtension(),
@@ -162,8 +169,12 @@ class Message(Base):
     last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
     text = Column(UnicodeText, nullable=False)
 
+    @reify
+    def html(self):
+        return Markup(md.convert(escape(self.text)))
+
     def __repr__(self):
-        if len(text) > 50:
+        if len(self.text) > 50:
             return "<Message #{}: {}>".format(self.id, self.text[:47] + "...")
         return "<Message #{}: {}>".format(self.id, self.text)
 
