@@ -19,7 +19,23 @@
 </ul>
 % endif
 
+<header>
+  <div id="header_inner">
+    <a id="logo" href="${request.route_path("home")}">Log Cabin</a>
+    % if request.user:
+    <nav>
+      <ul>
+        <li><a href="/${request.route_path("users.profile", username=request.user.username)}">Your cabin</a></li>
+        <li><a href="NOTBEENDONEYET">Upload</a></li>
+      </ul>
+    </nav>
+    % endif
+  </div>
+</header>
+
+<main>
 ${next.body()}
+</main>
 
 <script src="/static/logcabin.js"></script>
 
