@@ -12,7 +12,7 @@
 
 <% flash_messages = request.session.pop_flash() %>
 % if flash_messages:
-<ul class="flash_messages">
+<ul id="flash_messages">
   % for message in flash_messages:
   <li>${message}</li>
   % endfor
