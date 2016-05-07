@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 from pyramid.authentication import Authenticated
 
-from logcabin.models import Session, User
+from logcabin.models import User
 
 
 @view_config(route_name="home", renderer="home_unauthenticated.mako")

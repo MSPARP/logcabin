@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
-from logcabin.models import Session, User
+from logcabin.models import User
 
 
 def error_response(request, message):
@@ -44,13 +44,13 @@ def register(request):
         return error_response(request, "Please enter a valid email address.")
 
     if (
-        Session.query(func.count("*")).select_from(User)
+        request.db.query(func.count("*")).select_from(User)
         .filter(func.lower(User.username) == username.lower()).scalar()
     ):
         return error_response(request, "There's already an account called %s. Please choose a different username." % username)
 
     if (
-        Session.query(func.count("*")).select_from(User)
+        request.db.query(func.count("*")).select_from(User)
         .filter(func.lower(User.email_address) == email_address.lower()).scalar()
     ):
         return error_response(request, "There's already an account with that email address.")
@@ -63,8 +63,8 @@ def register(request):
         # todo timezone?
     )
     new_user.set_password(request.POST["password"])
-    Session.add(new_user)
-    Session.flush()
+    request.db.add(new_user)
+    request.db.flush()
 
     remember(request, new_user.id)
     return success_response(request, "Welcome to Log Cabin!")
@@ -77,7 +77,7 @@ def log_in(request):
 
     try:
         username = request.POST["username"].strip()[:User.username.type.length]
-        user = Session.query(User).filter(func.lower(User.username) == username.lower()).one()
+        user = request.db.query(User).filter(func.lower(User.username) == username.lower()).one()
     except NoResultFound:
         return error_response(request, "There isn't an account called %s." % username)
 
@@ -115,8 +115,6 @@ def change_password(request):
     if not request.user.check_password(request.POST["old_password"]):
         return error_response(request, "That's the wrong password.")
 
-    # request.user doesn't belong to this session, so we can't update it.
-    user = Session.query(User).filter(User.id == request.user.id).one()
-    user.set_password(request.POST["new_password"])
+    request.user.set_password(request.POST["new_password"])
     return success_response(request, "Your password has been changed.")
 

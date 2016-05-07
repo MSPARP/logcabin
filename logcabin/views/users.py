@@ -3,27 +3,27 @@ from pyramid.view import view_config
 from pytz import utc
 from sqlalchemy.orm import joinedload
 
-from logcabin.models import Session, Favorite, Log, LogSubscription
+from logcabin.models import Favorite, Log, LogSubscription
 
 
 @view_config(route_name="users.profile", renderer="users/profile.mako")
 def users_profile(context, request):
     return {
         "recent_logs": (
-            Session.query(Log)
+            request.db.query(Log)
             .filter(Log.creator_id == context.id)
             .order_by(Log.last_modified.desc())
             .limit(10).all()
         ),
         "favorites": (
-            Session.query(Favorite)
+            request.db.query(Favorite)
             .filter(Favorite.user_id == context.id)
             .order_by(Favorite.created.desc())
             .options(joinedload(Favorite.log).joinedload(Log.creator))
             .limit(10).all()
         ),
         "log_subscriptions": (
-            Session.query(LogSubscription)
+            request.db.query(LogSubscription)
             .filter(LogSubscription.user_id == context.id)
             .order_by(LogSubscription.created.desc())
             .options(joinedload(LogSubscription.log).joinedload(Log.creator))
@@ -38,7 +38,7 @@ def users_profile(context, request):
 def users_logs(context, request):
     return {
         "recent_logs": (
-            Session.query(Log)
+            request.db.query(Log)
             .filter(Log.creator_id == context.id)
             .order_by(Log.last_modified.desc())
             .limit(25).all()
@@ -51,7 +51,7 @@ def users_logs(context, request):
 def users_logs_feed(context, request):
     entries = []
     for log in (
-        Session.query(Log)
+        request.db.query(Log)
         .filter(Log.creator_id == context.id)
         .order_by(Log.last_modified.desc())
         .limit(25).all()
@@ -75,7 +75,7 @@ def users_logs_feed(context, request):
 def users_favorites(context, request):
     return {
         "favorites": (
-            Session.query(Favorite)
+            request.db.query(Favorite)
             .filter(Favorite.user_id == context.id)
             .order_by(Favorite.created.desc())
             .options(joinedload(Favorite.log).joinedload(Log.creator))
@@ -89,7 +89,7 @@ def users_favorites(context, request):
 def users_favorites_feed(context, request):
     entries = []
     for favorite in (
-        Session.query(Favorite)
+        request.db.query(Favorite)
         .filter(Favorite.user_id == context.id)
         .order_by(Favorite.created.desc())
         .options(joinedload(Favorite.log).joinedload(Log.creator))
@@ -114,7 +114,7 @@ def users_favorites_feed(context, request):
 def users_subscriptions(context, request):
     return {
         "log_subscriptions": (
-            Session.query(LogSubscription)
+            request.db.query(LogSubscription)
             .filter(LogSubscription.user_id == context.id)
             .order_by(LogSubscription.created.desc())
             .options(joinedload(LogSubscription.log).joinedload(Log.creator))
@@ -128,7 +128,7 @@ def users_subscriptions(context, request):
 def users_subscriptions_feed(context, request):
     entries = []
     for subscription in (
-        Session.query(LogSubscription)
+        request.db.query(LogSubscription)
         .filter(LogSubscription.user_id == context.id)
         .order_by(LogSubscription.created.desc())
         .options(joinedload(LogSubscription.log).joinedload(Log.creator))

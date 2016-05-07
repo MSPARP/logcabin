@@ -23,7 +23,6 @@ from sqlalchemy.dialects.postgresql import INET
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     relationship,
-    scoped_session,
     sessionmaker,
 )
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -35,10 +34,7 @@ from logcabin.lib.formats import camel_registry
 md = markdown.Markdown()
 
 
-Session = scoped_session(sessionmaker(
-    extension=ZopeTransactionExtension(),
-    expire_on_commit=False,
-))
+Session = sessionmaker(extension=ZopeTransactionExtension())
 Base = declarative_base()
 
 

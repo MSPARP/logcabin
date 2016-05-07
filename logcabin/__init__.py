@@ -31,12 +31,20 @@ class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
         return ret
 
 
+def request_db(request):
+    db = Session()
+    @request.add_finished_callback
+    def close_db(request):
+        db.close()
+    return db
+
+
 def request_user(request):
     if not request.unauthenticated_userid:
         return None
 
     try:
-        user = Session.query(User).filter(User.id == request.unauthenticated_userid).one()
+        user = request.db.query(User).filter(User.id == request.unauthenticated_userid).one()
     except NoResultFound:
         return None
 
@@ -46,11 +54,6 @@ def request_user(request):
         if user.unban_delta.total_seconds() < 0:
             user.unban_date = None
             user.status = "active"
-    # The ACL stuff means the user object belongs to a different
-    # transaction to the rest of the request, so we have to manually
-    # commit it here (and set the Session to not expire on commit).
-    # TODO consider not using scoped_session and just making the Session a request property
-    transaction.commit()
 
     return user
 
@@ -67,6 +70,7 @@ def main(global_config, **settings):
     )
     config.include("pyramid_mako")
 
+    config.add_request_method(request_db, 'db', reify=True)
     config.add_request_method(request_user, 'user', reify=True)
 
     config.include("logcabin.lib.formats")
