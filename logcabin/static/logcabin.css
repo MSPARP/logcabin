@@ -15,7 +15,7 @@ body { background-color: #eee; line-height: 1.5rem; }
 h1 { font-weight: normal; }
 
 body > header { overflow: hidden; background-color: #999; line-height: 2.5rem; }
-#header_inner { margin: 0 auto; max-width: 900px; }
+#header_inner { max-width: 900px; margin: 0 auto; }
 #logo { float: left; margin: 0; font-size: 1.5rem; }
 header nav { float: left; }
 header ul { margin: 0; padding: 0; list-style-type: none; }
@@ -23,6 +23,8 @@ header li { float: left; margin-left: 0.75rem; }
 
 #flash_messages { margin-top: 0; padding: 0; list-style-type: none; text-align: center; }
 #flash_messages li { padding: 5px 10px; background-color: #fff; }
+
+main { max-width: 900px; margin: 0 auto; }
 
 /* Logs */
 

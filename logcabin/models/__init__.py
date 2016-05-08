@@ -58,8 +58,8 @@ class User(Base, Resource):
     id = Column(Integer, primary_key=True)
     username = Column(URLSegment, nullable=False)
     password = Column(String(60)) # bcrypt hash
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
-    last_online = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    created = Column(DateTime, nullable=False, server_default=func.now())
+    last_online = Column(DateTime, nullable=False, server_default=func.now())
     last_ip = Column(INET, nullable=False)
     status = Column(Enum("guest", "active", "banned", name="user_status"), nullable=False, default=u"active")
     unban_date = Column(DateTime)
@@ -104,8 +104,8 @@ class Log(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(100), nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
-    last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    created = Column(DateTime, nullable=False, server_default=func.now())
+    last_modified = Column(DateTime, nullable=False, server_default=func.now())
     summary = Column(Unicode(255))
 
     def __repr__(self):
@@ -133,8 +133,8 @@ class Chapter(Base):
     number = Column(Integer, nullable=False)
     name = Column(Unicode(100), nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
-    last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    created = Column(DateTime, nullable=False, server_default=func.now())
+    last_modified = Column(DateTime, nullable=False, server_default=func.now())
 
     def __repr__(self):
         return "<Chapter #{}: {}>".format(self.id, self.name)
@@ -161,8 +161,8 @@ class Message(Base):
     chapter_id = Column(Integer, ForeignKey(Chapter.id), nullable=False)
     number = Column(Integer, nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
-    last_modified = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    created = Column(DateTime, nullable=False, server_default=func.now())
+    last_modified = Column(DateTime, nullable=False, server_default=func.now())
     text = Column(UnicodeText, nullable=False)
 
     @reify
@@ -194,7 +194,7 @@ class LogSubscription(Base):
     __tablename__ = "log_subscriptions"
     user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
     log_id = Column(Integer, ForeignKey(Log.id), primary_key=True)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    created = Column(DateTime, nullable=False, server_default=func.now())
 
     def __json__(self, request=None):
         return {
@@ -213,7 +213,7 @@ class Favorite(Base):
     __tablename__ = "favorites"
     user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
     log_id = Column(Integer, ForeignKey(Log.id), primary_key=True)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    created = Column(DateTime, nullable=False, server_default=func.now())
 
     def __json__(self, request=None):
         return {
