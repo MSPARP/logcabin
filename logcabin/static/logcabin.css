@@ -24,6 +24,10 @@ header li { float: left; margin-left: 0.75rem; }
 #flash_messages { margin-top: 0; padding: 0; list-style-type: none; text-align: center; }
 #flash_messages li { padding: 5px 10px; background-color: #fff; }
 
+#breadcrumb ul { margin: 10px 0 0; padding: 0; list-style-type: none; }
+#breadcrumb li { display: inline; }
+#breadcrumb li::after { content: " »"; }
+
 main { max-width: 900px; margin: 0 auto; }
 
 /* Logs */
