@@ -15,18 +15,22 @@ def get_user(request):
 
 def get_log(request):
     try:
-        return request.db.query(Log).filter(Log.id == int(request.matchdict["log_id"])).one()
+        log = request.db.query(Log).filter(Log.id == int(request.matchdict["log_id"])).one()
     except (ValueError, NoResultFound):
         raise HTTPNotFound
+    request.response.headers["Last-Modified"] = log.last_modified.strftime("%a, %d %b %Y %H:%M:%S UTC")
+    return log
 
 
 def get_chapter(request):
     log = get_log(request)
     try:
-        return request.db.query(Chapter).filter(and_(
+        chapter = request.db.query(Chapter).filter(and_(
             Chapter.log_id == log.id,
             Chapter.number == int(request.matchdict["number"]),
         )).one()
     except (ValueError, NoResultFound):
         raise HTTPNotFound
+    request.response.headers["Last-Modified"] = chapter.last_modified.strftime("%a, %d %b %Y %H:%M:%S UTC")
+    return chapter
 
