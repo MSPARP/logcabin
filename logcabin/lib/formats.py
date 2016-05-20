@@ -5,6 +5,14 @@ from pyramid.renderers import JSON
 from pytz import utc
 
 
+extension_content_types = {
+    "json": "application/json",
+    "yaml": "application/yaml",
+    "rss": "application/rss+xml",
+    "atom": "application/atom+xml",
+}
+
+
 JSONRenderer = JSON()
 JSONRenderer.add_adapter(datetime, lambda obj, request: obj.isoformat())
 
@@ -17,7 +25,7 @@ class YAMLRenderer(object):
         pass
 
     def __call__(self, value, system):
-        system["request"].response.headers["Content-type"] = "application/yaml; charset=UTF-8"
+        system["request"].response.headers["Content-type"] = extension_content_types["yaml"] + "; charset=UTF-8"
         return camel.dump(value)
 
 
@@ -43,11 +51,11 @@ class FeedRenderer(object):
         for entry in value["entries"]:
             feed.add_entry(entry)
 
+        system["request"].response.headers["Content-type"] = extension_content_types[system["renderer_name"]] + "; charset=UTF-8"
+
         if system["renderer_name"] == "rss":
-            system["request"].response.headers["Content-type"] = "application/rss+xml; charset=UTF-8"
             return feed.rss_str(pretty=True)
         else:
-            system["request"].response.headers["Content-type"] = "application/atom+xml; charset=UTF-8"
             return feed.atom_str(pretty=True)
 
 
@@ -74,14 +82,6 @@ def add_ext_route(self, name, pattern, **kwargs):
     ext_name = name + ".ext"
     ext_pattern = pattern + ".{ext}"
     self.add_route(ext_name, ext_pattern, **kwargs)
-
-
-extension_content_types = {
-    "json": "application/json",
-    "yaml": "application/yaml",
-    "rss": "application/rss+xml",
-    "atom": "application/atom+xml",
-}
 
 
 def request_extensions(request):
