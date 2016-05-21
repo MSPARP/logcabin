@@ -1,6 +1,7 @@
 from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy import and_
 from sqlalchemy.exc import StatementError
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from logcabin.models import User, Log, Chapter
@@ -23,12 +24,11 @@ def get_log(request):
 
 
 def get_chapter(request):
-    log = get_log(request)
     try:
         chapter = request.db.query(Chapter).filter(and_(
-            Chapter.log_id == log.id,
+            Chapter.log_id == int(request.matchdict["log_id"]),
             Chapter.number == int(request.matchdict["number"]),
-        )).one()
+        )).options(joinedload(Chapter.log)).one()
     except (ValueError, NoResultFound):
         raise HTTPNotFound
     request.response.headers["Last-Modified"] = chapter.last_modified.strftime("%a, %d %b %Y %H:%M:%S UTC")
