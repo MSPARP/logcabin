@@ -11,8 +11,8 @@ body.unauthenticated #account_forms .controls { text-align: right; }
 
 /* Main layout */
 
-body { background-color: #eee; line-height: 1.5rem; }
-h1 { font-weight: normal; }
+body { background-color: #eee; line-height: 1.5; }
+h1 { margin: 2rem 0 0; font-weight: normal; text-align: center; }
 
 body > header { overflow: hidden; background-color: #999; line-height: 2.5rem; }
 #header_inner { max-width: 900px; margin: 0 auto; }
@@ -32,9 +32,12 @@ main { max-width: 900px; margin: 0 auto; }
 
 /* Logs */
 
+#author { margin-top : 0; text-align: center; }
+#summary { max-width: 500px; margin: 2rem auto; }
+
 #log_body { overflow: hidden; max-width: 900px; margin: 0 auto; background-color: #fff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; font-family: serif; }
 #log_body > header { padding: 75px 100px; border-bottom: 1px solid #ddd; }
 #log_body > section { margin: 75px 100px; font-size: 1.2rem; }
-#log_body > section h1 { margin-bottom: 3rem; }
+#log_body > section h1 { margin: 0 0 3rem; }
 #log_body p { line-height: 2rem; }
 

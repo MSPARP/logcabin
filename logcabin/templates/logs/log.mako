@@ -2,10 +2,9 @@
 <%block name="title">${request.context.name} - </%block>
 
 <h1>${request.context.name}</h1>
+<p id="author">by <a href="${request.route_path("users.profile", username=request.context.creator.username)}">${request.context.creator.username}</a></p>
 
-<p>by <a href="${request.route_path("users.profile", username=request.context.creator.username)}">${request.context.creator.username}</a></p>
-
-<p>Summary: ${request.context.summary}</p>
+<p id="summary">Summary: ${request.context.summary}</p>
 
 <h2>Chapters</h2>
 <ol>
