@@ -1,6 +1,8 @@
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.security import forget, remember
 from pyramid.view import view_config
+from pyramid_mailer import get_mailer
+from pyramid_mailer.message import Message as EmailMessage
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -65,6 +67,15 @@ def register(request):
     new_user.set_password(request.POST["password"])
     request.db.add(new_user)
     request.db.flush()
+
+    mailer = get_mailer(request)
+    message = EmailMessage(
+        subject="Verify your email address",
+        sender="admin@logcabin.com",
+        recipients=[email_address],
+        body="Verify your email address",
+    )
+    mailer.send(message)
 
     remember(request, new_user.id)
     return success_response(request, "Welcome to Log Cabin!")
