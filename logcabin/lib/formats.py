@@ -78,10 +78,10 @@ class ExtensionPredicate(object):
 
 
 def add_ext_route(self, name, pattern, **kwargs):
-    self.add_route(name, pattern, **kwargs)
     ext_name = name + ".ext"
     ext_pattern = pattern + ".{ext}"
     self.add_route(ext_name, ext_pattern, **kwargs)
+    self.add_route(name, pattern, **kwargs)
 
 
 def request_extensions(request):

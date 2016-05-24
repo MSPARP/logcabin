@@ -1,10 +1,11 @@
-from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
+from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
 from pyramid.security import forget, remember
 from pyramid.view import view_config
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message as EmailMessage
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
+from uuid import uuid4
 
 from logcabin.models import User
 
@@ -68,12 +69,17 @@ def register(request):
     request.db.add(new_user)
     request.db.flush()
 
+    email_token = str(uuid4())
+    request.session.redis.setex("verify:%s:%s" % (new_user.id, email_address), 86400, email_token)
+
     mailer = get_mailer(request)
     message = EmailMessage(
         subject="Verify your email address",
         sender="admin@logcabin.com",
         recipients=[email_address],
-        body="Verify your email address",
+        body=request.route_url("account.verify_email", _query={
+            "user_id": new_user.id, "email_address": email_address, "token": email_token,
+        }),
     )
     mailer.send(message)
 
@@ -103,6 +109,37 @@ def log_in(request):
 def log_out(request):
     forget(request)
     request.session.flash("we'll miss u :'(")
+    return HTTPFound(request.route_path("home"))
+
+
+@view_config(route_name="account.verify_email", request_method="GET")
+def verify_email(request):
+    try:
+        user_id = int(request.GET["user_id"].strip())
+        email_address = request.GET["email_address"].strip()
+        token = request.GET["token"].strip()
+    except (KeyError, ValueError):
+        raise HTTPNotFound
+    stored_token = request.session.redis.get("verify:%s:%s" % (user_id, email_address))
+    if not user_id or not email_address or not token or not stored_token:
+        raise HTTPNotFound
+
+    stored_token = stored_token.decode("utf-8")
+
+    if not stored_token == token:
+        raise HTTPNotFound
+
+    try:
+        user = request.db.query(User).filter(User.id == user_id).one()
+    except NoResultFound:
+        raise HTTPNotFound
+
+    user.email_address = email_address
+    user.email_verified = True
+
+    remember(request, user.id)
+    request.session.flash("Your email address has been verified.")
+
     return HTTPFound(request.route_path("home"))
 
 
