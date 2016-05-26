@@ -25,6 +25,22 @@ def success_response(request, message):
     return HTTPFound(go_to_url)
 
 
+def send_verification_email(request, user, email_address):
+    email_token = str(uuid4())
+    request.session.redis.setex("verify:%s:%s" % (user.id, email_address), 86400, email_token)
+
+    mailer = get_mailer(request)
+    message = EmailMessage(
+        subject="Verify your email address",
+        sender="admin@logcabin.com",
+        recipients=[email_address],
+        body=request.route_url("account.verify_email", _query={
+            "user_id": user.id, "email_address": email_address, "token": email_token,
+        }),
+    )
+    mailer.send(message)
+
+
 @view_config(route_name="account.register", request_method="POST", renderer="json")
 def register(request):
     if (
@@ -69,19 +85,7 @@ def register(request):
     request.db.add(new_user)
     request.db.flush()
 
-    email_token = str(uuid4())
-    request.session.redis.setex("verify:%s:%s" % (new_user.id, email_address), 86400, email_token)
-
-    mailer = get_mailer(request)
-    message = EmailMessage(
-        subject="Verify your email address",
-        sender="admin@logcabin.com",
-        recipients=[email_address],
-        body=request.route_url("account.verify_email", _query={
-            "user_id": new_user.id, "email_address": email_address, "token": email_token,
-        }),
-    )
-    mailer.send(message)
+    send_verification_email(request, new_user, email_address)
 
     remember(request, new_user.id)
     return success_response(request, "Welcome to Log Cabin!")
@@ -165,4 +169,24 @@ def change_password(request):
 
     request.user.set_password(request.POST["new_password"])
     return success_response(request, "Your password has been changed.")
+
+
+@view_config(route_name="account.change_email", request_method="POST", renderer="json")
+def change_email(request):
+    if not request.POST.get("email_address"):
+        return error_response(request, "Please enter an email address.")
+
+    email_address = request.POST["email_address"].strip()[:User.email_address.type.length]
+    if not User.email_address.type.regex.match(email_address):
+        return error_response(request, "Please enter a valid email address.")
+
+    if (
+        request.db.query(func.count("*")).select_from(User)
+        .filter(func.lower(User.email_address) == email_address.lower()).scalar()
+    ):
+        return error_response(request, "There's already an account with that email address.")
+
+    send_verification_email(request, request.user, email_address)
+
+    return success_response(request, "Check your email and click the link to verify your new address.")
 
