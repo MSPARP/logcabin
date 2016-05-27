@@ -147,12 +147,12 @@ def verify_email(request):
     return HTTPFound(request.route_path("home"))
 
 
-@view_config(route_name="account.settings", request_method="GET", renderer="account/settings.mako")
+@view_config(route_name="account.settings", request_method="GET", permission="view", renderer="account/settings.mako")
 def settings(request):
     return {}
 
 
-@view_config(route_name="account.change_password", request_method="POST", renderer="json")
+@view_config(route_name="account.change_password", request_method="POST", permission="view", renderer="json")
 def change_password(request):
     if (
         not request.POST.get("old_password")
@@ -171,7 +171,7 @@ def change_password(request):
     return success_response(request, "Your password has been changed.")
 
 
-@view_config(route_name="account.change_email", request_method="POST", renderer="json")
+@view_config(route_name="account.change_email", request_method="POST", permission="view", renderer="json")
 def change_email(request):
     if not request.POST.get("email_address"):
         return error_response(request, "Please enter an email address.")

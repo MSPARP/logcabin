@@ -2,12 +2,13 @@ import datetime
 import transaction
 
 from pyramid.authentication import Authenticated, Everyone, SessionAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
-from logcabin.models import Base, Session, User
+from logcabin.models import Base, Session, Resource, User
 from logcabin.resources import get_user, get_log, get_chapter
 
 
@@ -29,6 +30,11 @@ class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
         ret = super().forget(request)
         request.session.invalidate()
         return ret
+
+
+class LogCabinRootFactory(Resource):
+    def __init__(self, *args):
+        pass
 
 
 def request_db(request):
@@ -67,6 +73,8 @@ def main(global_config, **settings):
     config = Configurator(
         settings=settings,
         authentication_policy=LogCabinAuthenticationPolicy(),
+        authorization_policy=ACLAuthorizationPolicy(),
+        root_factory=LogCabinRootFactory,
     )
     config.include("pyramid_mako")
 
