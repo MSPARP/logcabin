@@ -133,6 +133,13 @@ def verify_email(request):
     if not stored_token == token:
         raise HTTPNotFound
 
+    if (
+        request.db.query(func.count("*")).select_from(User)
+        .filter(func.lower(User.email_address) == email_address.lower()).scalar()
+    ):
+        request.session.flash("There's already an account with that email address.")
+        return HTTPFound(request.route_path("home"))
+
     try:
         user = request.db.query(User).filter(User.id == user_id).one()
     except NoResultFound:
