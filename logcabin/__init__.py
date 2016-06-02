@@ -90,6 +90,8 @@ def main(global_config, **settings):
     config.add_route("account.register", "/account/register")
     config.add_route("account.log_in", "/account/log_in")
     config.add_route("account.log_out", "/account/log_out")
+    config.add_route("account.forgot_password", "/account/forgot_password")
+    config.add_route("account.reset_password", "/account/reset_password")
     config.add_route("account.verify_email", "/account/verify_email")
     config.add_route("account.settings", "/account/settings")
     config.add_route("account.change_password", "/account/change_password")

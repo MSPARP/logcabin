@@ -1,4 +1,5 @@
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
+from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
 from pyramid.view import view_config
 from pyramid_mailer import get_mailer
@@ -25,16 +26,16 @@ def success_response(request, message):
     return HTTPFound(go_to_url)
 
 
-def send_verification_email(request, user, email_address):
+def send_email(request, action, user, email_address):
     email_token = str(uuid4())
-    request.session.redis.setex("verify:%s:%s" % (user.id, email_address), 86400, email_token)
+    request.session.redis.setex(":".join([action, str(user.id), email_address]), 86400 if action == "verify" else 600, email_token)
 
     mailer = get_mailer(request)
     message = EmailMessage(
-        subject="Verify your email address",
+        subject=action.capitalize() + " your email address",
         sender="admin@logcabin.com",
         recipients=[email_address],
-        body=request.route_url("account.verify_email", _query={
+        body=request.route_url("account." + ("verify_email" if action == "verify" else "reset_password"), _query={
             "user_id": user.id, "email_address": email_address, "token": email_token,
         }),
     )
@@ -85,7 +86,7 @@ def register(request):
     request.db.add(new_user)
     request.db.flush()
 
-    send_verification_email(request, new_user, email_address)
+    send_email(request, "verify", new_user, email_address)
 
     remember(request, new_user.id)
     return success_response(request, "Welcome to Log Cabin!")
@@ -114,6 +115,26 @@ def log_out(request):
     forget(request)
     request.session.flash("we'll miss u :'(")
     return HTTPFound(request.route_path("home"))
+
+
+@view_config(route_name="account.forgot_password", request_method="GET", renderer="account/forgot_password.mako")
+def forgot_password_get(request):
+    return {}
+
+
+@view_config(route_name="account.forgot_password", request_method="POST", renderer="base_unauthenticated.mako")
+def forgot_password_post(request):
+    try:
+        username = request.POST["username"].strip()[:User.username.type.length]
+        user = request.db.query(User).filter(func.lower(User.username) == username.lower()).one()
+    except NoResultFound:
+        request.session.flash("There isn't an account called %s." % username)
+        return render_to_response("account/forgot_password.mako", {}, request)
+
+    send_email(request, "reset", user, user.email_address)
+
+    request.session.flash("We've sent a link to the email address on your account. Please check your email to finish resetting your password.")
+    return {}
 
 
 @view_config(route_name="account.verify_email", request_method="GET")
@@ -193,7 +214,7 @@ def change_email(request):
     ):
         return error_response(request, "There's already an account with that email address.")
 
-    send_verification_email(request, request.user, email_address)
+    send_email(request, "verify", request.user, email_address)
 
     return success_response(request, "Check your email and click the link to verify your new address.")
 
