@@ -1,3 +1,5 @@
+import requests
+
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
 from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
@@ -177,7 +179,20 @@ def verify_email(request):
 
 @view_config(route_name="account.settings", request_method="GET", permission="view", renderer="account/settings.mako")
 def settings(request):
-    return {}
+    cherubplay_accounts = []
+    if request.user.email_verified and "urls.cherubplay" in request.registry.settings:
+        cherubplay_request = requests.get(
+            request.registry.settings["urls.cherubplay"] + "/api/users.json",
+            params={"email_address": request.user.email_address},
+            verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
+            cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
+        )
+        print(cherubplay_request)
+        print(cherubplay_request.status_code)
+        print(cherubplay_request.text)
+        if cherubplay_request.status_code == 200:
+            cherubplay_accounts = cherubplay_request.json()["users"]
+    return {"cherubplay_accounts": cherubplay_accounts}
 
 
 @view_config(route_name="account.change_password", request_method="POST", permission="view", renderer="json")

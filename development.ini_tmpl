@@ -38,6 +38,12 @@ redis.sessions.prefix = session:
 mail.host = localhost
 mail.port = 25
 
+certificates.client_certificate = /ca/intermediate/certs/logcabin.cert.pem
+certificates.client_key = /ca/intermediate/private/logcabin.key.pem
+
+urls.cherubplay_url = https://localhost
+urls.msparp_url = https://localhost
+
 # By default, the toolbar only appears for clients from IP addresses
 # '127.0.0.1' and '::1'.
 # debugtoolbar.hosts = 127.0.0.1 ::1

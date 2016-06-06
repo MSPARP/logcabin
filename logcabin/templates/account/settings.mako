@@ -22,3 +22,17 @@
     <p class="controls"><button type="submit">Change</button></p>
   </form>
 </section>
+
+% if cherubplay_accounts or msparp_accounts:
+<section>
+  <h2>Linked accounts</h2>
+  % if cherubplay_accounts:
+  <h3>Cherubplay</h3>
+  <ul>
+    % for account in cherubplay_accounts:
+    <li>${account["username"]}</li>
+    % endfor
+  </ul>
+  % endif
+</section>
+% endif
