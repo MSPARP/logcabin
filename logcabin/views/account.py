@@ -6,6 +6,7 @@ from pyramid.security import forget, remember
 from pyramid.view import view_config
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message as EmailMessage
+from requests.exceptions import RequestException
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from uuid import uuid4
@@ -181,17 +182,20 @@ def verify_email(request):
 def settings(request):
     cherubplay_accounts = []
     if request.user.email_verified and "urls.cherubplay" in request.registry.settings:
-        cherubplay_request = requests.get(
-            request.registry.settings["urls.cherubplay"] + "/api/users.json",
-            params={"email_address": request.user.email_address},
-            verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
-            cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
-        )
-        print(cherubplay_request)
-        print(cherubplay_request.status_code)
-        print(cherubplay_request.text)
-        if cherubplay_request.status_code == 200:
-            cherubplay_accounts = cherubplay_request.json()["users"]
+        try:
+            cherubplay_request = requests.get(
+                request.registry.settings["urls.cherubplay"] + "/api/users.json",
+                params={"email_address": request.user.email_address},
+                verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
+                cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
+            )
+            print(cherubplay_request)
+            print(cherubplay_request.status_code)
+            print(cherubplay_request.text)
+            if cherubplay_request.status_code == 200:
+                cherubplay_accounts = cherubplay_request.json()["users"]
+        except RequestException:
+            pass
     return {"cherubplay_accounts": cherubplay_accounts}
 
 
