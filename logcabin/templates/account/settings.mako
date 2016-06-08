@@ -34,5 +34,13 @@
     % endfor
   </ul>
   % endif
+  % if msparp_accounts:
+  <h3>MSPARP</h3>
+  <ul>
+    % for account in msparp_accounts:
+    <li>${account["username"]}</li>
+    % endfor
+  </ul>
+  % endif
 </section>
 % endif

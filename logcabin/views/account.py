@@ -181,22 +181,36 @@ def verify_email(request):
 @view_config(route_name="account.settings", request_method="GET", permission="view", renderer="account/settings.mako")
 def settings(request):
     cherubplay_accounts = []
-    if request.user.email_verified and "urls.cherubplay" in request.registry.settings:
+    msparp_accounts = []
+    if request.user.email_verified:
         try:
-            cherubplay_request = requests.get(
-                request.registry.settings["urls.cherubplay"] + "/api/users.json",
-                params={"email_address": request.user.email_address},
-                verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
-                cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
-            )
-            print(cherubplay_request)
-            print(cherubplay_request.status_code)
-            print(cherubplay_request.text)
-            if cherubplay_request.status_code == 200:
-                cherubplay_accounts = cherubplay_request.json()["users"]
+            if "urls.cherubplay" in request.registry.settings:
+                cherubplay_request = requests.get(
+                    request.registry.settings["urls.cherubplay"] + "/api/users.json",
+                    params={"email_address": request.user.email_address},
+                    verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
+                    cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
+                )
+                if cherubplay_request.status_code == 200:
+                    cherubplay_accounts = cherubplay_request.json()["users"]
+            if "urls.msparp" in request.registry.settings:
+                msparp_request = requests.get(
+                    request.registry.settings["urls.msparp"] + "/api/users.json",
+                    params={"email_address": request.user.email_address},
+                    verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
+                    cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
+                )
+                print(msparp_request)
+                print(msparp_request.status_code)
+                print(msparp_request.text)
+                if msparp_request.status_code == 200:
+                    msparp_accounts = msparp_request.json()["users"]
         except RequestException:
             pass
-    return {"cherubplay_accounts": cherubplay_accounts}
+    return {
+        "cherubplay_accounts": cherubplay_accounts,
+        "msparp_accounts": msparp_accounts,
+    }
 
 
 @view_config(route_name="account.change_password", request_method="POST", permission="view", renderer="json")
