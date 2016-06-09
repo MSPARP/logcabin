@@ -62,6 +62,7 @@ class User(Base, Resource):
     last_online = Column(DateTime, nullable=False, server_default=func.now())
     last_ip = Column(INET, nullable=False)
     status = Column(Enum("guest", "active", "banned", name="user_status"), nullable=False, default=u"active")
+    is_admin = Column(Boolean, nullable=False, default=False)
     unban_date = Column(DateTime)
     email_address = Column(EmailAddress)
     email_verified = Column(Boolean)

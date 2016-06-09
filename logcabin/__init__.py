@@ -16,11 +16,12 @@ class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
     def callback(self, userid, request):
         if not request.user:
             return None
-        return {
-            "banned": ("banned",),
-            "guest": (),
-            "active": ("active",),
-        }[request.user.status]
+        principals = [Authenticated]
+        if request.user.status != "guest":
+            principals.append(request.user.status)
+        if request.user.status == "active" and request.user.is_admin:
+            principals.append("admin")
+        return principals
 
     def remember(self, request, userid, **kwargs):
         request.session.adjust_timeout_for_session(2592000)
