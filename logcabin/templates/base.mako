@@ -17,7 +17,7 @@
     <nav>
       <ul>
         <li><a href="${request.route_path("users.profile", username=request.user.username)}">Your cabin</a></li>
-        <li><a href="NOTBEENDONEYET">Upload</a></li>
+        <li><a href="${request.route_path("upload")}">Upload</a></li>
       </ul>
     </nav>
     % endif
