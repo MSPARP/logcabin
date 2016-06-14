@@ -1,10 +1,10 @@
-import requests
+from requests import Session
 
 
 class CherubplayClient(object):
     def __init__(self, request):
         self.settings = request.registry.settings
-        self.session = requests.Session()
+        self.session = Session()
         if "pyramid_debugtoolbar" in self.settings["pyramid.includes"]:
             self.session.verify = False
         self.session.cert = (
@@ -19,4 +19,14 @@ class CherubplayClient(object):
         )
         if api_request.status_code == 200:
             return api_request.json()["users"]
+        return []
+
+    def account_chats(self, account_id):
+        api_request = self.session.get(
+            self.settings["urls.cherubplay"] + "/chats.json",
+            headers={"X-Cherubplay-User-Id": account_id},
+        )
+        if api_request.status_code == 200:
+            return api_request.json()["chats"]
+        return []
 
