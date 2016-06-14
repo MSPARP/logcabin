@@ -11,6 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from uuid import uuid4
 
+from logcabin.lib.cherubplay import CherubplayClient
 from logcabin.models import User
 
 
@@ -185,14 +186,7 @@ def settings(request):
     if request.user.email_verified:
         try:
             if "urls.cherubplay" in request.registry.settings:
-                cherubplay_request = requests.get(
-                    request.registry.settings["urls.cherubplay"] + "/api/users.json",
-                    params={"email_address": request.user.email_address},
-                    verify=False if "pyramid_debugtoolbar" in request.registry.settings["pyramid.includes"] else None,
-                    cert=(request.registry.settings["certificates.client_certificate"], request.registry.settings["certificates.client_key"]),
-                )
-                if cherubplay_request.status_code == 200:
-                    cherubplay_accounts = cherubplay_request.json()["users"]
+                cherubplay_accounts = CherubplayClient(request).user_accounts(request.user)
             if "urls.msparp" in request.registry.settings:
                 msparp_request = requests.get(
                     request.registry.settings["urls.msparp"] + "/api/users.json",
