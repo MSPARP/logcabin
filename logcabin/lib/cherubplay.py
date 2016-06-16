@@ -13,6 +13,8 @@ class CherubplayClient(object):
         )
 
     def user_accounts(self, user):
+        if not user.email_verified:
+            return []
         api_request = self.session.get(
             self.settings["urls.cherubplay"] + "/api/users.json",
             params={"email_address": user.email_address},
@@ -38,6 +40,6 @@ class CherubplayClient(object):
             params={"page": page},
         )
         if api_request.status_code == 200:
-            return api_request.json()["messages"]
-        return []
+            return api_request.json()
+        return None
 

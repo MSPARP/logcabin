@@ -108,6 +108,7 @@ def main(global_config, **settings):
     config.add_ext_route("logs.chapter", "/logs/{log_id:\d+}/chapters/{number:\d+}", factory=get_chapter)
 
     config.add_ext_route("upload", "/upload")
+    config.add_ext_route("upload_cherubplay", "/upload/cherubplay/{username}/{url}")
 
     config.scan()
     return config.make_wsgi_app()

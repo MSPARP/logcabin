@@ -1,6 +1,7 @@
 import requests
 
 from collections import OrderedDict
+from pyramid.httpexceptions import HTTPForbidden, HTTPNotFound
 from pyramid.view import view_config
 from pyramid.authentication import Authenticated
 from requests.exceptions import RequestException
@@ -23,4 +24,31 @@ def upload(request):
         except RequestException:
             pass
     return {"cherubplay_chats": cherubplay_chats}
+
+
+@view_config(route_name="upload_cherubplay", renderer="upload_cherubplay.mako")
+def upload_cherubplay(request):
+
+    if not request.user.email_verified: # TODO make a permission for this
+        raise HTTPForbidden
+
+    cherubplay = CherubplayClient(request)
+
+    user_account = None
+    for account in cherubplay.user_accounts(request.user):
+        if account["username"] == request.matchdict["username"]:
+            user_account = account
+
+    if user_account is None:
+        raise HTTPNotFound
+
+    chat_log = cherubplay.chat_log(user_account["id"], request.matchdict["url"])
+
+    if not chat_log["messages"]:
+        raise HTTPNotFound
+
+    return {
+        "account": user_account,
+        "chat_log": chat_log,
+    }
 
