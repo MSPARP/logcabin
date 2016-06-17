@@ -8,7 +8,7 @@ from pyramid.authentication import Authenticated
 from requests.exceptions import RequestException
 
 from logcabin.lib.cherubplay import CherubplayClient
-from logcabin.models import User, Log, Chapter, Message
+from logcabin.models import User, Log, CherubplaySource, Chapter, Message
 
 
 @view_config(route_name="upload", renderer="upload/index.mako")
@@ -65,11 +65,20 @@ def upload_cherubplay_post(request):
     if not request.POST.get("name"):
         raise HTTPBadRequest
 
-    new_log = Log(name=request.POST["name"], creator_id=request.user.id)
+    new_log = Log(
+        name=request.POST["name"],
+        creator=request.user,
+    )
     request.db.add(new_log)
     request.db.flush()
 
-    new_chapter = Chapter(log_id=new_log.id, number=1, name="Chapter 1", creator_id=request.user.id)
+    request.db.add(CherubplaySource(
+        log=new_log,
+        url=chat_log["chat"]["url"],
+        account_id=user_account["id"],
+    ))
+
+    new_chapter = Chapter(log=new_log, number=1, name="Chapter 1", creator_id=request.user.id)
     request.db.add(new_chapter)
     request.db.flush()
 
@@ -77,9 +86,9 @@ def upload_cherubplay_post(request):
 
     for number, message in enumerate(chat_log["messages"], 1):
         request.db.add(Message(
-            chapter_id=new_chapter.id,
+            chapter=new_chapter,
             number=number,
-            creator_id =request.user.id,
+            creator=request.user,
             created=message["posted"],
             last_modified=message["edited"],
             text=message["text"],
@@ -90,9 +99,9 @@ def upload_cherubplay_post(request):
         page = cherubplay.chat_log(user_account["id"], request.matchdict["url"], page=page_number)
         for number, message in enumerate(page["messages"], number):
             request.db.add(Message(
-                chapter_id=new_chapter.id,
+                chapter=new_chapter,
                 number=number,
-                creator_id =request.user.id,
+                creator=request.user,
                 created=message["posted"],
                 last_modified=message["edited"],
                 text=message["text"],

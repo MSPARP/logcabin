@@ -127,6 +127,28 @@ camel_registry.dumper(Log, "log", version=None)(Log.__json__)
 Log.creator = relationship(User, backref="logs_created")
 
 
+class Source(Base):
+    __tablename__ = "sources"
+    __mapper_args__ = {"polymorphic_on": "type"}
+    id = Column(Integer, primary_key=True)
+    log_id = Column(Integer, ForeignKey(Log.id), nullable=False)
+    type = Column(Enum("cherubplay", "msparp", name="source_type"), nullable=False)
+    url = Column(Unicode(100), nullable=False)
+    account_id = Column(Integer, nullable=False)
+    last_import = Column(DateTime, nullable=False, server_default=func.now())
+    auto_import = Column(Boolean, nullable=False, server_default="true")
+
+Source.log = relationship(Log, backref="sources")
+
+
+class CherubplaySource(Source):
+    __mapper_args__ = {"polymorphic_identity": "cherubplay"}
+
+
+class MSPARPSource(Source):
+    __mapper_args__ = {"polymorphic_identity": "msparp"}
+
+
 class Chapter(Base):
     __tablename__ = "chapters"
     id = Column(Integer, primary_key=True)
