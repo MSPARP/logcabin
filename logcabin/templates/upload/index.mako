@@ -10,7 +10,7 @@
   <h3>${username}</h3>
   <ul>
     % for chat in chats:
-    <li><a href="${request.registry.settings["urls.cherubplay"]}/chats/${chat["chat"]["url"]}/">${chat["chat_user"]["title"] or chat["chat"]["url"]}</a></li>
+    <li><a href="${request.route_path("upload.cherubplay", username=username, url=chat["chat"]["url"])}">${chat["chat_user"]["title"] or chat["chat"]["url"]}</a></li>
     % endfor
   </ul>
   % endfor
