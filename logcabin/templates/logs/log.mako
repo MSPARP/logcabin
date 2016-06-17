@@ -22,3 +22,24 @@
 </ol>
 % endif
 
+% if sources:
+<h2>Source${"s" if len(sources) > 1 else ""}</h2>
+<ul>
+  % for source, chat_log, user_account in sources:
+  <li>
+    % if source.type == "cherubplay":
+    <p><a href="${request.registry.settings["urls.cherubplay"]}/chats/${chat_log["chat"]["url"]}/" target="_blank">${chat_log["chat_user"]["title"] if chat_log["chat_user"] and chat_log["chat_user"]["title"] else chat_log["chat"]["url"]}</a></p>
+    <p>
+      From Cherubplay,
+      % if user_account:
+      via ${user_account["username"]}.
+      % else:
+      anonymously.
+      % endif
+    </p>
+    <p>Auto-import ${"enabled" if source.auto_import else "disabled"}, last import ${source.last_import}.</p>
+    % endif
+  </li>
+  % endfor
+</ul>
+% endif

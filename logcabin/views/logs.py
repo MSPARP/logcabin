@@ -2,6 +2,7 @@ from pyramid.view import view_config
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
+from logcabin.lib.cherubplay import CherubplayClient
 from logcabin.models import Chapter, Log, Message
 
 
@@ -17,11 +18,27 @@ def logs_log(context, request):
         oldest_chapters = request.db.query(Chapter).filter(Chapter.log_id == context.id).order_by(Chapter.number).limit(5).all()
         newest_chapters = request.db.query(Chapter).filter(Chapter.log_id == context.id).order_by(Chapter.number.desc()).limit(5).all()
         newest_chapters.reverse()
+
+    sources = []
+    if request.user == context.creator:
+        cherubplay = CherubplayClient(request)
+        user_accounts = cherubplay.user_accounts(request.user)
+        for source in context.sources:
+            if source.type == "cherubplay":
+                try:
+                    account = [account for account in user_accounts if account["id"] == source.account_id][0]
+                except IndexError:
+                    account = None
+                sources.append((source, cherubplay.chat_log(source.account_id, source.url), account))
+            else:
+                raise NotImplementedError
+
     return {
         "log": context,
         "chapter_count": chapter_count,
         "oldest_chapters": oldest_chapters,
         "newest_chapters": newest_chapters,
+        "sources": sources,
     }
 
 
