@@ -137,6 +137,7 @@ class Source(Base):
     account_id = Column(Integer, nullable=False)
     last_import = Column(DateTime, nullable=False, server_default=func.now())
     auto_import = Column(Boolean, nullable=False, server_default="true")
+    include_ooc = Column(Boolean, nullable=False, server_default="false")
 
 Source.log = relationship(Log, backref="sources")
 

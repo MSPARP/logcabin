@@ -76,6 +76,7 @@ def upload_cherubplay_post(request):
         log=new_log,
         url=chat_log["chat"]["url"],
         account_id=user_account["id"],
+        include_ooc="include_ooc" in request.POST,
     ))
 
     new_chapter = Chapter(log=new_log, number=1, name="Chapter 1", creator_id=request.user.id)
@@ -85,6 +86,8 @@ def upload_cherubplay_post(request):
     page_count = math.ceil(float(chat_log["message_count"]) / len(chat_log["messages"]))
 
     for number, message in enumerate(chat_log["messages"], 1):
+        if message["type"] == "ooc" and "include_ooc" not in request.POST:
+            continue
         request.db.add(Message(
             chapter=new_chapter,
             number=number,
@@ -98,6 +101,8 @@ def upload_cherubplay_post(request):
     for page_number in range(2, page_count + 1):
         page = cherubplay.chat_log(user_account["id"], request.matchdict["url"], page=page_number)
         for number, message in enumerate(page["messages"], number):
+            if message["type"] == "ooc" and "include_ooc" not in request.POST:
+                continue
             request.db.add(Message(
                 chapter=new_chapter,
                 number=number,
