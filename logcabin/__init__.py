@@ -12,16 +12,18 @@ from logcabin.models import Base, Session, Resource, User
 from logcabin.resources import get_user, get_log, get_chapter
 
 
+def authentication_callback(userid, request):
+    if not request.user:
+        return None
+    principals = [Everyone, Authenticated]
+    if request.user.status != "guest":
+        principals.append(request.user.status)
+    if request.user.status == "active" and request.user.is_admin:
+        principals.append("admin")
+    return principals
+
+
 class LogCabinAuthenticationPolicy(SessionAuthenticationPolicy):
-    def callback(self, userid, request):
-        if not request.user:
-            return None
-        principals = [Authenticated]
-        if request.user.status != "guest":
-            principals.append(request.user.status)
-        if request.user.status == "active" and request.user.is_admin:
-            principals.append("admin")
-        return principals
 
     def remember(self, request, userid, **kwargs):
         request.session.adjust_timeout_for_session(2592000)
@@ -73,7 +75,7 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
     config = Configurator(
         settings=settings,
-        authentication_policy=LogCabinAuthenticationPolicy(),
+        authentication_policy=LogCabinAuthenticationPolicy(callback=authentication_callback),
         authorization_policy=ACLAuthorizationPolicy(),
         root_factory=LogCabinRootFactory,
     )
