@@ -2,7 +2,7 @@ import requests
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
 from pyramid.renderers import render_to_response
-from pyramid.security import forget, remember
+from pyramid.security import forget, remember, NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message as EmailMessage
@@ -46,7 +46,7 @@ def send_email(request, action, user, email_address):
     mailer.send(message)
 
 
-@view_config(route_name="account.register", request_method="POST", renderer="json")
+@view_config(route_name="account.register", request_method="POST", renderer="json", permission=NO_PERMISSION_REQUIRED)
 def register(request):
     if (
         not request.POST.get("username")
@@ -96,7 +96,7 @@ def register(request):
     return success_response(request, "Welcome to Log Cabin!")
 
 
-@view_config(route_name="account.log_in", request_method="POST", renderer="json")
+@view_config(route_name="account.log_in", request_method="POST", renderer="json", permission=NO_PERMISSION_REQUIRED)
 def log_in(request):
     if not request.POST.get("username") or not request.POST.get("password"):
         return error_response(request, "Please fill in all the fields.")
@@ -121,12 +121,12 @@ def log_out(request):
     return HTTPFound(request.route_path("home"))
 
 
-@view_config(route_name="account.forgot_password", request_method="GET", renderer="account/forgot_password.mako")
+@view_config(route_name="account.forgot_password", request_method="GET", permission=NO_PERMISSION_REQUIRED, renderer="account/forgot_password.mako")
 def forgot_password_get(request):
     return {}
 
 
-@view_config(route_name="account.forgot_password", request_method="POST", renderer="base_unauthenticated.mako")
+@view_config(route_name="account.forgot_password", request_method="POST", permission=NO_PERMISSION_REQUIRED, renderer="base_unauthenticated.mako")
 def forgot_password_post(request):
     try:
         username = request.POST["username"].strip()[:User.username.type.length]
@@ -141,7 +141,7 @@ def forgot_password_post(request):
     return {}
 
 
-@view_config(route_name="account.verify_email", request_method="GET")
+@view_config(route_name="account.verify_email", request_method="GET", permission=NO_PERMISSION_REQUIRED)
 def verify_email(request):
     try:
         user_id = int(request.GET["user_id"].strip())
@@ -179,7 +179,7 @@ def verify_email(request):
     return HTTPFound(request.route_path("home"))
 
 
-@view_config(route_name="account.settings", request_method="GET", permission="view", renderer="account/settings.mako")
+@view_config(route_name="account.settings", request_method="GET", renderer="account/settings.mako")
 def settings(request):
     cherubplay_accounts = []
     msparp_accounts = []
@@ -207,7 +207,7 @@ def settings(request):
     }
 
 
-@view_config(route_name="account.change_password", request_method="POST", permission="view", renderer="json")
+@view_config(route_name="account.change_password", request_method="POST", renderer="json")
 def change_password(request):
     if (
         not request.POST.get("old_password")
@@ -226,7 +226,7 @@ def change_password(request):
     return success_response(request, "Your password has been changed.")
 
 
-@view_config(route_name="account.change_email", request_method="POST", permission="view", renderer="json")
+@view_config(route_name="account.change_email", request_method="POST", renderer="json")
 def change_email(request):
     if not request.POST.get("email_address"):
         return error_response(request, "Please enter an email address.")

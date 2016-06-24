@@ -77,6 +77,7 @@ def main(global_config, **settings):
         settings=settings,
         authentication_policy=LogCabinAuthenticationPolicy(callback=authentication_callback),
         authorization_policy=ACLAuthorizationPolicy(),
+        default_permission="view",
         root_factory=LogCabinRootFactory,
     )
     config.include("pyramid_mako")

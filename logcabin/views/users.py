@@ -1,4 +1,5 @@
 from feedgen.entry import FeedEntry
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
 from pytz import utc
 from sqlalchemy.orm import joinedload
@@ -6,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from logcabin.models import Favorite, Log, LogSubscription
 
 
-@view_config(route_name="users.profile", renderer="users/profile.mako")
+@view_config(route_name="users.profile", permission=NO_PERMISSION_REQUIRED, renderer="users/profile.mako")
 def users_profile(context, request):
     return {
         "recent_logs": (
@@ -32,9 +33,9 @@ def users_profile(context, request):
     }
 
 
-@view_config(route_name="users.logs", renderer="users/logs.mako")
-@view_config(route_name="users.logs.ext", extension="json", renderer="json")
-@view_config(route_name="users.logs.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="users.logs", permission=NO_PERMISSION_REQUIRED, renderer="users/logs.mako")
+@view_config(route_name="users.logs.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
+@view_config(route_name="users.logs.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def users_logs(context, request):
     return {
         "recent_logs": (
@@ -46,8 +47,8 @@ def users_logs(context, request):
     }
 
 
-@view_config(route_name="users.logs.ext", extension="rss", renderer="rss")
-@view_config(route_name="users.logs.ext", extension="atom", renderer="atom")
+@view_config(route_name="users.logs.ext", extension="rss", permission=NO_PERMISSION_REQUIRED, renderer="rss")
+@view_config(route_name="users.logs.ext", extension="atom", permission=NO_PERMISSION_REQUIRED, renderer="atom")
 def users_logs_feed(context, request):
     entries = []
     for log in (
@@ -69,9 +70,9 @@ def users_logs_feed(context, request):
     }
 
 
-@view_config(route_name="users.favorites", renderer="users/favorites.mako")
-@view_config(route_name="users.favorites.ext", extension="json", renderer="json")
-@view_config(route_name="users.favorites.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="users.favorites", permission=NO_PERMISSION_REQUIRED, renderer="users/favorites.mako")
+@view_config(route_name="users.favorites.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
+@view_config(route_name="users.favorites.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def users_favorites(context, request):
     return {
         "favorites": (
@@ -84,8 +85,8 @@ def users_favorites(context, request):
     }
 
 
-@view_config(route_name="users.favorites.ext", extension="rss", renderer="rss")
-@view_config(route_name="users.favorites.ext", extension="atom", renderer="atom")
+@view_config(route_name="users.favorites.ext", extension="rss", permission=NO_PERMISSION_REQUIRED, renderer="rss")
+@view_config(route_name="users.favorites.ext", extension="atom", permission=NO_PERMISSION_REQUIRED, renderer="atom")
 def users_favorites_feed(context, request):
     entries = []
     for favorite in (
@@ -108,9 +109,9 @@ def users_favorites_feed(context, request):
     }
 
 
-@view_config(route_name="users.subscriptions", renderer="users/subscriptions.mako")
-@view_config(route_name="users.subscriptions.ext", extension="json", renderer="json")
-@view_config(route_name="users.subscriptions.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="users.subscriptions", permission=NO_PERMISSION_REQUIRED, renderer="users/subscriptions.mako")
+@view_config(route_name="users.subscriptions.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
+@view_config(route_name="users.subscriptions.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def users_subscriptions(context, request):
     return {
         "log_subscriptions": (
@@ -123,8 +124,8 @@ def users_subscriptions(context, request):
     }
 
 
-@view_config(route_name="users.subscriptions.ext", extension="rss", renderer="rss")
-@view_config(route_name="users.subscriptions.ext", extension="atom", renderer="atom")
+@view_config(route_name="users.subscriptions.ext", extension="rss", permission=NO_PERMISSION_REQUIRED, renderer="rss")
+@view_config(route_name="users.subscriptions.ext", extension="atom", permission=NO_PERMISSION_REQUIRED, renderer="atom")
 def users_subscriptions_feed(context, request):
     entries = []
     for subscription in (

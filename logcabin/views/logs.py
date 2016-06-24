@@ -1,3 +1,4 @@
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -6,9 +7,9 @@ from logcabin.lib.cherubplay import CherubplayClient
 from logcabin.models import Chapter, Log, Message
 
 
-@view_config(route_name="logs.log", renderer="logs/log.mako")
-@view_config(route_name="logs.log.ext", extension="json", renderer="json")
-@view_config(route_name="logs.log.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="logs.log", permission=NO_PERMISSION_REQUIRED, renderer="logs/log.mako")
+@view_config(route_name="logs.log.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
+@view_config(route_name="logs.log.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def logs_log(context, request):
     chapter_count = request.db.query(func.count("*")).select_from(Chapter).filter(Chapter.log_id == context.id).scalar()
     if chapter_count <= 10:
@@ -42,16 +43,16 @@ def logs_log(context, request):
     }
 
 
-@view_config(route_name="logs.chapters", renderer="logs/chapters.mako")
-@view_config(route_name="logs.chapters.ext", extension="json", renderer="json")
-@view_config(route_name="logs.chapters.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="logs.chapters", permission=NO_PERMISSION_REQUIRED, renderer="logs/chapters.mako")
+@view_config(route_name="logs.chapters.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
+@view_config(route_name="logs.chapters.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def logs_chapters(context, request):
     return {"chapters": request.db.query(Chapter).filter(Chapter.log_id == context.id).order_by(Chapter.number).all()}
 
 
-@view_config(route_name="logs.chapter", renderer="logs/chapter.mako")
-@view_config(route_name="logs.chapter.ext", extension="json", renderer="json")
-@view_config(route_name="logs.chapter.ext", extension="yaml", renderer="yaml")
+@view_config(route_name="logs.chapter", permission=NO_PERMISSION_REQUIRED, renderer="logs/chapter.mako")
+@view_config(route_name="logs.chapter.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
+@view_config(route_name="logs.chapter.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def logs_chapter(context, request):
     return {
         "chapter": context,
