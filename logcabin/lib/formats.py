@@ -1,5 +1,5 @@
 from camel import Camel, CamelRegistry
-from datetime import datetime
+from datetime import date, datetime
 from feedgen.feed import FeedGenerator
 from pyramid.renderers import JSON
 from pytz import utc
@@ -14,6 +14,7 @@ extension_content_types = {
 
 
 JSONRenderer = JSON()
+JSONRenderer.add_adapter(date, lambda obj, request: obj.isoformat())
 JSONRenderer.add_adapter(datetime, lambda obj, request: obj.isoformat())
 
 

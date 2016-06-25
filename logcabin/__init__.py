@@ -20,6 +20,8 @@ def authentication_callback(userid, request):
         principals.append(request.user.status)
     if request.user.status == "active" and request.user.is_admin:
         principals.append("admin")
+    if request.user.email_verified:
+        principals.append("verified")
     return principals
 
 

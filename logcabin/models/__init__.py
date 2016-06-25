@@ -41,6 +41,7 @@ Base = declarative_base()
 class Resource(object):
     __acl__ = (
         (Allow, Authenticated, "view"),
+        (Allow, "verified", "import"),
         (Allow, "admin", "admin"),
     )
 

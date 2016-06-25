@@ -28,8 +28,6 @@ def upload(request):
 
 
 def _get_account_and_log(request, cherubplay):
-    if not request.user.email_verified: # TODO make a permission for this
-        raise HTTPForbidden
 
     user_account = None
     for account in cherubplay.user_accounts(request.user):
@@ -47,7 +45,7 @@ def _get_account_and_log(request, cherubplay):
     return user_account, chat_log
 
 
-@view_config(route_name="upload.cherubplay", renderer="upload/cherubplay.mako", request_method="GET")
+@view_config(route_name="upload.cherubplay", request_method="GET", permission="import", renderer="upload/cherubplay.mako")
 def upload_cherubplay_get(request):
     cherubplay = CherubplayClient(request)
     user_account, chat_log = _get_account_and_log(request, cherubplay)
@@ -57,7 +55,7 @@ def upload_cherubplay_get(request):
     }
 
 
-@view_config(route_name="upload.cherubplay", request_method="POST")
+@view_config(route_name="upload.cherubplay", request_method="POST", permission="import")
 def upload_cherubplay_post(request):
     cherubplay = CherubplayClient(request)
     user_account, chat_log = _get_account_and_log(request, cherubplay)
