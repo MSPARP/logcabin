@@ -28,7 +28,7 @@
   % for source, chat_log, user_account in sources:
   <li>
     % if source.type == "cherubplay":
-    <p><a href="${request.registry.settings["urls.cherubplay"]}/chats/${chat_log["chat"]["url"]}/" target="_blank">${chat_log["chat_user"]["title"] if chat_log["chat_user"] and chat_log["chat_user"]["title"] else chat_log["chat"]["url"]}</a></p>
+    <p><a href="${request.registry.settings["urls.cherubplay"]}/chats/${source.url}/" target="_blank">${chat_log["chat_user"]["title"] if chat_log and chat_log["chat_user"] and chat_log["chat_user"]["title"] else source.url}</a></p>
     <p>
       From Cherubplay,
       % if user_account:
