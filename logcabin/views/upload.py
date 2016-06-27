@@ -8,12 +8,14 @@ from pyramid.authentication import Authenticated
 from requests.exceptions import RequestException
 
 from logcabin.lib.cherubplay import CherubplayClient
+from logcabin.lib.msparp import MSPARPClient
 from logcabin.models import User, Log, CherubplaySource, Chapter, Message
 
 
 @view_config(route_name="upload", renderer="upload/index.mako")
 def upload(request):
     cherubplay_chats = OrderedDict()
+    msparp_chats = OrderedDict()
     if request.user.email_verified:
         try:
             if "urls.cherubplay" in request.registry.settings:
@@ -22,9 +24,18 @@ def upload(request):
                     (account["username"], cherubplay.account_chats(account["id"]))
                     for account in cherubplay.user_accounts(request.user)
                 ])
+            if "urls.msparp" in request.registry.settings:
+                msparp = MSPARPClient(request)
+                msparp_chats = OrderedDict([
+                    (account["username"], msparp.account_chats(account["id"]))
+                    for account in msparp.user_accounts(request.user)
+                ])
         except RequestException:
             pass
-    return {"cherubplay_chats": cherubplay_chats}
+    return {
+        "cherubplay_chats": cherubplay_chats,
+        "msparp_chats": msparp_chats,
+    }
 
 
 def _get_account_and_log(request, cherubplay):

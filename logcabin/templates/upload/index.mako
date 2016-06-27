@@ -17,3 +17,17 @@
 </section>
 % endif
 
+% if msparp_chats:
+<section>
+  <h2>Import from MSPARP</h2>
+  % for username, chats in msparp_chats.items():
+  <h3>${username}</h3>
+  <ul>
+    % for chat in chats:
+    <li><a href="${request.route_path("upload.cherubplay", username=username, url=chat["chat"]["url"])}">${chat["chat"]["title"]}</a></li>
+    % endfor
+  </ul>
+  % endfor
+</section>
+% endif
+

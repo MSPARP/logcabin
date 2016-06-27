@@ -114,6 +114,7 @@ def main(global_config, **settings):
 
     config.add_ext_route("upload", "/upload")
     config.add_ext_route("upload.cherubplay", "/upload/cherubplay/{username}/{url}")
+    config.add_ext_route("upload.msparp", "/upload/msparp/{username}/{url}")
 
     config.scan()
     return config.make_wsgi_app()
