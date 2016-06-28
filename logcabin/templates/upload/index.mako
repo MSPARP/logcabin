@@ -24,7 +24,7 @@
   <h3>${username}</h3>
   <ul>
     % for chat in chats:
-    <li><a href="${request.route_path("upload.cherubplay", username=username, url=chat["chat"]["url"])}">${chat["chat"]["title"]}</a></li>
+    <li><a href="${request.route_path("upload.msparp", username=username, url=chat["chat"]["url"])}">${chat["chat"]["title"]}</a></li>
     % endfor
   </ul>
   % endfor

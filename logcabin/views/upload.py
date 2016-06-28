@@ -123,3 +123,27 @@ def upload_cherubplay_post(request):
 
     return HTTPFound(request.route_path("logs.chapter", log_id=new_log.id, number=1))
 
+
+@view_config(route_name="upload.msparp", request_method="GET", permission="import", renderer="upload/msparp.mako")
+def upload_msparp_get(request):
+    msparp = MSPARPClient(request)
+
+    user_account = None
+    for account in msparp.user_accounts(request.user):
+        if account["username"] == request.matchdict["username"]:
+            user_account = account
+
+    if user_account is None:
+        raise HTTPNotFound
+
+    chat_log = msparp.chat_log(user_account["id"], request.matchdict["url"])
+
+    # TODO make group chats work
+    if not chat_log:
+        raise HTTPNotFound
+
+    return {
+        "account": user_account,
+        "chat_log": chat_log,
+    }
+
