@@ -159,60 +159,39 @@ class Chapter(Base):
     name = Column(Unicode(100), nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
-    last_modified = Column(DateTime, nullable=False, server_default=func.now())
 
-    def __repr__(self):
-        return "<Chapter #{}: {}>".format(self.id, self.name)
 
-    def __json__(self, request=None):
-        return {
-            "id": self.id,
-            "number": self.number,
-            "name": self.name,
-            "creator": self.creator,
-            "created": self.created,
-            "last_modified": self.last_modified,
-        }
-
-camel_registry.dumper(Chapter, "chapter", version=None)(Chapter.__json__)
-
-Chapter.log = relationship(Log, backref="chapters")
-Chapter.creator = relationship(User, backref="chapters_created")
+class ChapterRevision(Base):
+    __tablename__ = "chapter_revisions"
+    id = Column(Integer, primary_key=True)
+    chapter_id = Column(Integer, ForeignKey(Chapter.id), nullable=False)
+    creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    created = Column(DateTime, nullable=False, server_default=func.now())
 
 
 class Message(Base):
     __tablename__ = "messages"
     id = Column(Integer, primary_key=True)
-    chapter_id = Column(Integer, ForeignKey(Chapter.id), nullable=False)
-    number = Column(Integer, nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
-    last_modified = Column(DateTime, nullable=False, server_default=func.now())
+    #character_id = Column(Integer, ForeignKey(Character.id))
+    imported_from = Column(Unicode(100))
+
+
+class MessageRevision(Base):
+    __tablename__ = "message_revisions"
+    id = Column(Integer, primary_key=True)
+    message_id = Column(Integer, ForeignKey(Message.id), nullable=False)
+    creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    created = Column(DateTime, nullable=False, server_default=func.now())
     text = Column(UnicodeText, nullable=False)
 
-    @reify
-    def html(self):
-        return Markup(md.convert(escape(self.text)))
 
-    def __repr__(self):
-        if len(self.text) > 50:
-            return "<Message #{}: {}>".format(self.id, self.text[:47] + "...")
-        return "<Message #{}: {}>".format(self.id, self.text)
-
-    def __json__(self, request=None):
-        return {
-            "id": self.id,
-            "number": self.number,
-            "creator": self.creator,
-            "created": self.created,
-            "last_modified": self.last_modified,
-            "text": self.text,
-        }
-
-camel_registry.dumper(Message, "message", version=None)(Message.__json__)
-
-Message.chapter = relationship(Chapter, backref="messages")
-Message.creator = relationship(User, backref="messages_created")
+class ChapterRevisionMessageRevision(Base):
+    __tablename__ = "chapter_revision_message_revisions"
+    chapter_revision_id = Column(Integer, ForeignKey(ChapterRevision.id), primary_key=True)
+    message_revision_id = Column(Integer, ForeignKey(MessageRevision.id), primary_key=True)
+    number = Column(Integer, nullable=False)
 
 
 class LogSubscription(Base):
