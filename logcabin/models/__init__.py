@@ -160,6 +160,9 @@ class Chapter(Base):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
 
+Log.chapters = relationship(Chapter, backref="log", order_by=Chapter.number)
+Chapter.creator = relationship(User)
+
 
 class ChapterRevision(Base):
     __tablename__ = "chapter_revisions"
@@ -167,6 +170,9 @@ class ChapterRevision(Base):
     chapter_id = Column(Integer, ForeignKey(Chapter.id), nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
+
+Chapter.revisions = relationship(ChapterRevision, backref="chapter", order_by=ChapterRevision.created.desc())
+ChapterRevision.creator = relationship(User)
 
 
 class Message(Base):
@@ -177,6 +183,8 @@ class Message(Base):
     #character_id = Column(Integer, ForeignKey(Character.id))
     imported_from = Column(Unicode(100))
 
+Message.creator = relationship(User)
+
 
 class MessageRevision(Base):
     __tablename__ = "message_revisions"
@@ -186,12 +194,18 @@ class MessageRevision(Base):
     created = Column(DateTime, nullable=False, server_default=func.now())
     text = Column(UnicodeText, nullable=False)
 
+Message.revisions = relationship(MessageRevision, backref="message", order_by=MessageRevision.created)
+MessageRevision.creator = relationship(User)
+
 
 class ChapterRevisionMessageRevision(Base):
     __tablename__ = "chapter_revision_message_revisions"
     chapter_revision_id = Column(Integer, ForeignKey(ChapterRevision.id), primary_key=True)
     message_revision_id = Column(Integer, ForeignKey(MessageRevision.id), primary_key=True)
     number = Column(Integer, nullable=False)
+
+ChapterRevision.message_revisions = relationship(ChapterRevisionMessageRevision, order_by=ChapterRevisionMessageRevision.number, backref="chapter_revision")
+MessageRevision.chapter_revisions = relationship(ChapterRevisionMessageRevision, backref="message_revision")
 
 
 class LogSubscription(Base):

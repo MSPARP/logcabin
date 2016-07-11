@@ -9,7 +9,7 @@ from requests.exceptions import RequestException
 
 from logcabin.lib.cherubplay import CherubplayClient
 from logcabin.lib.msparp import MSPARPClient
-from logcabin.models import User, Log, CherubplaySource, Chapter, Message
+from logcabin.models import User, Log, CherubplaySource, Chapter, ChapterRevision, Message, MessageRevision, ChapterRevisionMessageRevision
 
 
 @view_config(route_name="upload", renderer="upload/index.mako")
@@ -88,22 +88,37 @@ def upload_cherubplay_post(request):
         include_ooc="include_ooc" in request.POST,
     ))
 
-    new_chapter = Chapter(log=new_log, number=1, name="Chapter 1", creator_id=request.user.id)
+    new_chapter = Chapter(log=new_log, number=1, name="Chapter 1", creator=request.user)
     request.db.add(new_chapter)
     request.db.flush()
+
+    new_chapter_revision = ChapterRevision(chapter=new_chapter, creator=request.user)
 
     page_count = math.ceil(float(chat_log["message_count"]) / len(chat_log["messages"]))
 
     for number, message in enumerate(chat_log["messages"], 1):
         if message["type"] == "ooc" and "include_ooc" not in request.POST:
             continue
-        request.db.add(Message(
-            chapter=new_chapter,
-            number=number,
+        new_message = Message(
             creator=request.user,
             created=message["posted"],
-            last_modified=message["edited"],
+            imported_from="cherubplay:%s" % message["id"],
+        )
+        request.db.add(new_message)
+        request.db.flush()
+        new_message_revision = MessageRevision(
+            message=new_message,
+            creator=request.user,
+            created=message["edited"],
             text=message["text"],
+
+        )
+        request.db.add(new_message_revision)
+        request.db.flush()
+        request.db.add(ChapterRevisionMessageRevision(
+            chapter_revision=new_chapter_revision,
+            message_revision=new_message_revision,
+            number=number,
         ))
 
     # TODO move all this to celery
@@ -112,13 +127,26 @@ def upload_cherubplay_post(request):
         for number, message in enumerate(page["messages"], number):
             if message["type"] == "ooc" and "include_ooc" not in request.POST:
                 continue
-            request.db.add(Message(
-                chapter=new_chapter,
-                number=number,
+            new_message = Message(
                 creator=request.user,
                 created=message["posted"],
-                last_modified=message["edited"],
+                imported_from="cherubplay:%s" % message["id"],
+            )
+            request.db.add(new_message)
+            request.db.flush()
+            new_message_revision = MessageRevision(
+                message=new_message,
+                creator=request.user,
+                created=message["edited"],
                 text=message["text"],
+
+            )
+            request.db.add(new_message_revision)
+            request.db.flush()
+            request.db.add(ChapterRevisionMessageRevision(
+                chapter_revision=new_chapter_revision,
+                message_revision=new_message_revision,
+                number=number,
             ))
 
     return HTTPFound(request.route_path("logs.chapter", log_id=new_log.id, number=1))
