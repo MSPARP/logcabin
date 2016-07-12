@@ -160,6 +160,13 @@ class Chapter(Base):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
 
+    @property
+    def latest_revision(self):
+        try:
+            return self.revisions.limit(1).one()
+        except NoResultFound:
+            return None
+
 Log.chapters = relationship(Chapter, backref="log", order_by=Chapter.number)
 Chapter.creator = relationship(User)
 
@@ -171,7 +178,7 @@ class ChapterRevision(Base):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
 
-Chapter.revisions = relationship(ChapterRevision, backref="chapter", order_by=ChapterRevision.created.desc())
+Chapter.revisions = relationship(ChapterRevision, backref="chapter", order_by=ChapterRevision.created.desc(), lazy="dynamic")
 ChapterRevision.creator = relationship(User)
 
 

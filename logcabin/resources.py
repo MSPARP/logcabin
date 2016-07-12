@@ -31,6 +31,6 @@ def get_chapter(request):
         )).options(joinedload(Chapter.log)).one()
     except (ValueError, NoResultFound):
         raise HTTPNotFound
-    request.response.headers["Last-Modified"] = chapter.last_modified.strftime("%a, %d %b %Y %H:%M:%S UTC")
+    request.response.headers["Last-Modified"] = chapter.latest_revision.created.strftime("%a, %d %b %Y %H:%M:%S UTC")
     return chapter
 

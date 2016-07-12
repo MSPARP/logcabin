@@ -4,7 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from logcabin.lib.cherubplay import CherubplayClient
-from logcabin.models import Chapter, Log, Message
+from logcabin.models import Chapter, ChapterRevisionMessageRevision, Log, Message, MessageRevision
 
 
 @view_config(route_name="logs.log", permission=NO_PERMISSION_REQUIRED, renderer="logs/log.mako")
@@ -54,8 +54,11 @@ def logs_chapters(context, request):
 @view_config(route_name="logs.chapter.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
 @view_config(route_name="logs.chapter.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def logs_chapter(context, request):
-    return {
-        "chapter": context,
-        "messages": request.db.query(Message).filter(Message.chapter_id == context.id).order_by(Message.number).all(),
-    }
+    return {"messages": (
+        request.db.query(MessageRevision, Message)
+        .select_from(ChapterRevisionMessageRevision)
+        .join(ChapterRevisionMessageRevision.message_revision)
+        .join(MessageRevision.message)
+        .order_by(ChapterRevisionMessageRevision.number)
+    )}
 

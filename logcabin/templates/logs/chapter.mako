@@ -11,9 +11,9 @@
       <h1>${request.context.log.name}, ${request.context.name}</h1>
       <p>log info description tags etc</p>
     </header>
-    % for message in messages:
+    % for message_revision, message in messages:
     <section id="message${message.id}">
-      ${message.html}
+      ${message_revision.text}
     </section>
     % endfor
   </article>
