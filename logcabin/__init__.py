@@ -111,6 +111,8 @@ def main(global_config, **settings):
     config.add_ext_route("logs.log", "/logs/{log_id:\d+}", factory=get_log)
     config.add_ext_route("logs.chapters", "/logs/{log_id:\d+}/chapters", factory=get_log)
     config.add_ext_route("logs.chapter", "/logs/{log_id:\d+}/chapters/{number:\d+}", factory=get_chapter)
+    config.add_ext_route("logs.favorite", "/logs/{log_id:\d+}/favorite", factory=get_log)
+    config.add_ext_route("logs.unfavorite", "/logs/{log_id:\d+}/unfavorite", factory=get_log)
 
     config.add_ext_route("upload", "/upload")
     config.add_ext_route("upload.cherubplay", "/upload/cherubplay/{username}/{url}")

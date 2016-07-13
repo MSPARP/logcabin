@@ -6,6 +6,16 @@
 
 <p id="summary">Summary: ${request.context.summary}</p>
 
+% if favorite:
+<form action="${request.route_path("logs.unfavorite", log_id=request.context.id)}" method="post">
+  <button type="submit">Unfavorite</button>
+</form>
+% elif request.user:
+<form action="${request.route_path("logs.favorite", log_id=request.context.id)}" method="post">
+  <button type="submit">Favorite</button>
+</form>
+% endif
+
 <h2>Chapters</h2>
 <ol>
   % for chapter in oldest_chapters:

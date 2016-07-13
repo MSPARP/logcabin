@@ -101,7 +101,7 @@ Index("users_username", func.lower(User.username), unique=True)
 Index("users_email_address", func.lower(User.email_address), unique=True)
 
 
-class Log(Base):
+class Log(Base, Resource):
     __tablename__ = "logs"
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(100), nullable=False)
@@ -151,7 +151,7 @@ class MSPARPSource(Source):
     __mapper_args__ = {"polymorphic_identity": "msparp"}
 
 
-class Chapter(Base):
+class Chapter(Base, Resource):
     __tablename__ = "chapters"
     id = Column(Integer, primary_key=True)
     log_id = Column(Integer, ForeignKey(Log.id), nullable=False)

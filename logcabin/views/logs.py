@@ -1,10 +1,11 @@
+from pyramid.httpexceptions import HTTPFound
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from sqlalchemy.orm import joinedload
 
 from logcabin.lib.cherubplay import CherubplayClient
-from logcabin.models import Chapter, ChapterRevisionMessageRevision, Log, Message, MessageRevision
+from logcabin.models import Chapter, ChapterRevisionMessageRevision, Favorite, Log, Message, MessageRevision
 
 
 @view_config(route_name="logs.log", permission=NO_PERMISSION_REQUIRED, renderer="logs/log.mako")
@@ -40,6 +41,10 @@ def logs_log(context, request):
         "oldest_chapters": oldest_chapters,
         "newest_chapters": newest_chapters,
         "sources": sources,
+        "favorite": request.db.query(Favorite).filter(and_(
+            Favorite.log_id == context.id,
+            Favorite.user_id == request.user.id,
+        )).first() if request.user else None,
     }
 
 
@@ -61,4 +66,24 @@ def logs_chapter(context, request):
         .join(MessageRevision.message)
         .order_by(ChapterRevisionMessageRevision.number)
     )}
+
+
+@view_config(route_name="logs.favorite", request_method="POST")
+def logs_favorite(context, request):
+    existing_favorite = request.db.query(Favorite).filter(and_(
+        Favorite.log_id == context.id,
+        Favorite.user_id == request.user.id,
+    )).first()
+    if not existing_favorite:
+        request.db.add(Favorite(log=context, user=request.user))
+    return HTTPFound(request.headers.get("Referer") or request.route_path("logs.log", log_id=context.id))
+
+
+@view_config(route_name="logs.unfavorite", request_method="POST")
+def logs_unfavorite(context, request):
+    request.db.query(Favorite).filter(and_(
+        Favorite.log_id == context.id,
+        Favorite.user_id == request.user.id,
+    )).delete()
+    return HTTPFound(request.headers.get("Referer") or request.route_path("logs.log", log_id=context.id))
 
