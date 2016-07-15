@@ -6,7 +6,7 @@
 
 <p id="summary">Summary: ${request.context.summary}</p>
 
-% if favorite:
+% if own_favorite:
 <form action="${request.route_path("logs.unfavorite", log_id=request.context.id)}" method="post">
   <button type="submit">Unfavorite</button>
 </form>
@@ -14,6 +14,19 @@
 <form action="${request.route_path("logs.favorite", log_id=request.context.id)}" method="post">
   <button type="submit">Favorite</button>
 </form>
+% endif
+
+% if favorites:
+<h2>Favorited by</h2>
+<ul>
+  % for favorite in favorites:
+  % if favorite.user == request.user:
+  <li>You</li>
+  % else:
+  <li><a href="${request.route_path("users.profile", username=favorite.user.username)}">${favorite.user.username}</a></li>
+  % endif
+  % endfor
+</ul>
 % endif
 
 <h2>Chapters</h2>

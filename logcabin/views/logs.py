@@ -41,10 +41,17 @@ def logs_log(context, request):
         "oldest_chapters": oldest_chapters,
         "newest_chapters": newest_chapters,
         "sources": sources,
-        "favorite": request.db.query(Favorite).filter(and_(
+        "own_favorite": request.db.query(Favorite).filter(and_(
             Favorite.log_id == context.id,
             Favorite.user_id == request.user.id,
         )).first() if request.user else None,
+        "favorites": (
+            request.db.query(Favorite)
+            .filter(Favorite.log_id == context.id)
+            .order_by(Favorite.created.desc())
+            .options(joinedload(Favorite.user))
+            .limit(10).all()
+        ),
     }
 
 
