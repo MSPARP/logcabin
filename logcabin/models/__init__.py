@@ -1,8 +1,6 @@
 import datetime
-import markdown
 
 from bcrypt import gensalt, hashpw
-from markupsafe import Markup, escape
 from pyramid.decorator import reify
 from pyramid.security import Allow, Authenticated, Everyone
 from sqlalchemy import (
@@ -29,9 +27,6 @@ from zope.sqlalchemy import ZopeTransactionExtension
 
 from logcabin.models.types import URLSegment, EmailAddress
 from logcabin.lib.formats import camel_registry
-
-
-md = markdown.Markdown()
 
 
 Session = sessionmaker(extension=ZopeTransactionExtension())
@@ -200,6 +195,7 @@ class MessageRevision(Base):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
     text = Column(UnicodeText, nullable=False)
+    html_text = Column(UnicodeText, nullable=False)
 
 Message.revisions = relationship(MessageRevision, backref="message", order_by=MessageRevision.created)
 MessageRevision.creator = relationship(User)

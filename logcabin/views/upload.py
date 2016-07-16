@@ -2,6 +2,8 @@ import math
 import requests
 
 from collections import OrderedDict
+from markdown import Markdown
+from markupsafe import escape
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPFound, HTTPNotFound
 from pyramid.view import view_config
 from pyramid.authentication import Authenticated
@@ -10,6 +12,9 @@ from requests.exceptions import RequestException
 from logcabin.lib.cherubplay import CherubplayClient
 from logcabin.lib.msparp import MSPARPClient
 from logcabin.models import User, Log, CherubplaySource, Chapter, ChapterRevision, Message, MessageRevision, ChapterRevisionMessageRevision
+
+
+md = Markdown()
 
 
 @view_config(route_name="upload", renderer="upload/index.mako")
@@ -111,6 +116,7 @@ def upload_cherubplay_post(request):
             creator=request.user,
             created=message["edited"],
             text=message["text"],
+            html_text=md.convert(escape(message["text"])),
 
         )
         request.db.add(new_message_revision)
@@ -139,7 +145,7 @@ def upload_cherubplay_post(request):
                 creator=request.user,
                 created=message["edited"],
                 text=message["text"],
-
+                html_text=md.convert(escape(message["text"])),
             )
             request.db.add(new_message_revision)
             request.db.flush()

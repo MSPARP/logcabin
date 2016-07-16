@@ -13,7 +13,7 @@
     </header>
     % for message_revision, message in messages:
     <section id="message${message.id}">
-      ${message_revision.text}
+      ${message_revision.html_text|n}
     </section>
     % endfor
   </article>

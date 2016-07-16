@@ -71,6 +71,7 @@ def logs_chapter(context, request):
         .select_from(ChapterRevisionMessageRevision)
         .join(ChapterRevisionMessageRevision.message_revision)
         .join(MessageRevision.message)
+        .filter(ChapterRevisionMessageRevision.chapter_revision_id == context.latest_revision.id)
         .order_by(ChapterRevisionMessageRevision.number)
     )}
 
