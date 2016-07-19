@@ -155,7 +155,7 @@ class Chapter(Base, Resource):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
 
-    @property
+    @reify
     def latest_revision(self):
         try:
             return self.revisions.limit(1).one()

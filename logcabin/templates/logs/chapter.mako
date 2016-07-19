@@ -14,6 +14,9 @@
     % for message_revision, message in messages:
     <section id="message${message.id}">
       ${message_revision.html_text|n}
+      % if request.context.log.creator == request.user:
+      <a href="${request.route_path("logs.chapter.message", log_id=request.context.log.id, number=request.context.number, message_id=message.id)}">Edit</a>
+      % endif
     </section>
     % endfor
   </article>
