@@ -96,11 +96,14 @@ def logs_chapter_post(context, request):
         .order_by(ChapterRevisionMessageRevision.number)
     )
 
+    deleted_message_revisions = set()
     changed_message_revisions = []
 
     for message_revision, message in messages:
-        if request.POST.get("message_" + str(message.id)):
-            new_text = request.POST["message_" + str(message.id)].strip()
+        if request.POST.get("delete_" + str(message.id)):
+            deleted_message_revisions.add(message_revision.id)
+        elif request.POST.get("edit_" + str(message.id)):
+            new_text = request.POST["edit_" + str(message.id)].strip()
             if new_text == message_revision.text:
                 continue
             new_message_revision = MessageRevision(
@@ -113,20 +116,26 @@ def logs_chapter_post(context, request):
             request.db.flush()
             changed_message_revisions.append((message_revision.id, new_message_revision.id))
 
-    if changed_message_revisions:
+    if deleted_message_revisions or changed_message_revisions:
         # Create a new chapter revision by copying the message revision ids from the old one...
         new_chapter_revision = ChapterRevision(chapter=context, creator=request.user)
         request.db.flush()
+
+        message_revision_query = request.db.query(
+            literal(new_chapter_revision.id),
+            ChapterRevisionMessageRevision.number,
+            ChapterRevisionMessageRevision.message_revision_id,
+        ).filter(ChapterRevisionMessageRevision.chapter_revision_id == context.latest_revision.id)
+        if deleted_message_revisions:
+            message_revision_query = message_revision_query.filter(
+                ~ChapterRevisionMessageRevision.message_revision_id.in_(deleted_message_revisions),
+            )
+
         request.db.execute(ChapterRevisionMessageRevision.__table__.insert().from_select(
             ["chapter_revision_id", "number", "message_revision_id"],
-            request.db.query(
-                literal(new_chapter_revision.id),
-                ChapterRevisionMessageRevision.number,
-                ChapterRevisionMessageRevision.message_revision_id,
-            ).filter(
-                ChapterRevisionMessageRevision.chapter_revision_id == context.latest_revision.id,
-            ),
+            message_revision_query,
         ))
+
         # ...then swap out the message revision ids where necessary.
         for old_message_revision_id, new_message_revision_id in changed_message_revisions:
             request.db.query(ChapterRevisionMessageRevision).filter(and_(

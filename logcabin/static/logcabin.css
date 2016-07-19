@@ -41,3 +41,5 @@ main { max-width: 900px; margin: 0 auto; }
 #log_body > section h1 { margin: 0 0 3rem; }
 #log_body p { line-height: 2rem; }
 
+#save_chapter { position: fixed; right: 20px; bottom: 20px; }
+

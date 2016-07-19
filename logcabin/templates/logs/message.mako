@@ -8,7 +8,7 @@
     </ul>
   </nav>
   <form id="log_body" action="${request.route_path("logs.chapter", log_id=request.context.log_id, number=request.context.number)}" method="post">
-    <p><textarea name="message_${message_revision.message.id}">${message_revision.text}</textarea></p>
+    <p><textarea name="edit_${message_revision.message.id}">${message_revision.text}</textarea></p>
     <p><button type="submit">Save</button></p>
   </form>
 
