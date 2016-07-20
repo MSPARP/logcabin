@@ -185,6 +185,13 @@ class Message(Base):
     #character_id = Column(Integer, ForeignKey(Character.id))
     imported_from = Column(Unicode(100))
 
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "created": self.created,
+            "imported_from": self.imported_from,
+        }
+
 Message.creator = relationship(User)
 
 
@@ -196,6 +203,15 @@ class MessageRevision(Base):
     created = Column(DateTime, nullable=False, server_default=func.now())
     text = Column(UnicodeText, nullable=False)
     html_text = Column(UnicodeText, nullable=False)
+
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "created": self.created,
+            "text": self.text,
+            "html_text": self.html_text,
+            "message": self.message,
+        }
 
 Message.revisions = relationship(MessageRevision, backref="message", order_by=MessageRevision.created)
 MessageRevision.creator = relationship(User)

@@ -147,12 +147,14 @@ def logs_chapter_post(context, request):
 
 
 @view_config(route_name="logs.chapter.message", request_method="GET", renderer="logs/message.mako")
+@view_config(route_name="logs.chapter.message.ext", extension="json", request_method="GET", renderer="json")
+@view_config(route_name="logs.chapter.message.ext", extension="yaml", request_method="GET", renderer="yaml")
 def logs_chapter_message_get(context, request):
     if request.user != context.creator:
         raise HTTPNotFound
 
     try:
-        return {"message_revision": (
+        message_revision = (
             request.db.query(MessageRevision)
             .select_from(ChapterRevisionMessageRevision)
             .join(ChapterRevisionMessageRevision.message_revision)
@@ -161,9 +163,13 @@ def logs_chapter_message_get(context, request):
                 ChapterRevisionMessageRevision.chapter_revision_id == context.latest_revision.id,
                 MessageRevision.message_id == int(request.matchdict.get("message_id")),
             )).one()
-        )}
+        )
     except (ValueError, NoResultFound):
         raise HTTPNotFound
+
+    if request.matched_route.name == "logs.chapter.message":
+        return {"message_revision": message_revision}
+    return message_revision
 
 
 @view_config(route_name="logs.favorite", request_method="POST")
