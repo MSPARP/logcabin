@@ -155,12 +155,22 @@ class Chapter(Base, Resource):
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
 
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "number": self.number,
+            "name": self.name,
+            "created": self.created,
+        }
+
     @reify
     def latest_revision(self):
         try:
             return self.revisions.limit(1).one()
         except NoResultFound:
             return None
+
+camel_registry.dumper(Chapter, "chapter", version=None)(Chapter.__json__)
 
 Log.chapters = relationship(Chapter, backref="log", order_by=Chapter.number)
 Chapter.creator = relationship(User)
@@ -172,6 +182,14 @@ class ChapterRevision(Base):
     chapter_id = Column(Integer, ForeignKey(Chapter.id), nullable=False)
     creator_id = Column(Integer, ForeignKey(User.id), nullable=False)
     created = Column(DateTime, nullable=False, server_default=func.now())
+
+    def __json__(self, request=None):
+        return {
+            "id": self.id,
+            "created": self.created,
+        }
+
+camel_registry.dumper(ChapterRevision, "chapter_revision", version=None)(ChapterRevision.__json__)
 
 Chapter.revisions = relationship(ChapterRevision, backref="chapter", order_by=ChapterRevision.created.desc(), lazy="dynamic")
 ChapterRevision.creator = relationship(User)
@@ -191,6 +209,8 @@ class Message(Base):
             "created": self.created,
             "imported_from": self.imported_from,
         }
+
+camel_registry.dumper(Message, "message", version=None)(Message.__json__)
 
 Message.creator = relationship(User)
 
@@ -212,6 +232,8 @@ class MessageRevision(Base):
             "html_text": self.html_text,
             "message": self.message,
         }
+
+camel_registry.dumper(MessageRevision, "message_revision", version=None)(MessageRevision.__json__)
 
 Message.revisions = relationship(MessageRevision, backref="message", order_by=MessageRevision.created)
 MessageRevision.creator = relationship(User)

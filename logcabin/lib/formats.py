@@ -3,6 +3,7 @@ from datetime import date, datetime
 from feedgen.feed import FeedGenerator
 from pyramid.renderers import JSON
 from pytz import utc
+from sqlalchemy.orm.query import Query
 
 
 extension_content_types = {

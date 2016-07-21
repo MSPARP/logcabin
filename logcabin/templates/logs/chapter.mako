@@ -14,12 +14,12 @@
       <h1>${request.context.log.name}, ${request.context.name}</h1>
       <p>log info description tags etc</p>
     </header>
-    % for message_revision, message in messages:
-    <section id="message${message.id}">
+    % for message_revision in messages:
+    <section id="message${message_revision.message.id}">
       ${message_revision.html_text|n}
       % if request.context.log.creator == request.user:
-      <a href="${request.route_path("logs.chapter.message", log_id=request.context.log.id, number=request.context.number, message_id=message.id)}">Edit</a>
-      <label><input type="checkbox" name="delete_${message.id}"> Delete</label>
+      <a href="${request.route_path("logs.chapter.message", log_id=request.context.log.id, number=request.context.number, message_id=message_revision.message.id)}">Edit</a>
+      <label><input type="checkbox" name="delete_${message_revision.message.id}"> Delete</label>
       % endif
     </section>
     % endfor
