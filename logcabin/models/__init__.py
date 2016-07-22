@@ -187,6 +187,7 @@ class ChapterRevision(Base):
         return {
             "id": self.id,
             "created": self.created,
+            "chapter": self.chapter,
         }
 
 camel_registry.dumper(ChapterRevision, "chapter_revision", version=None)(ChapterRevision.__json__)

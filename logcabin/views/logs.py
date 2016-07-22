@@ -72,15 +72,14 @@ def logs_chapters(context, request):
 @view_config(route_name="logs.chapter.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
 def logs_chapter_get(context, request):
     return {
-        "chapter": context,
-        "latest_revision": context.latest_revision,
+        "chapter_revision": context.latest_revision,
         "messages": (
             request.db.query(MessageRevision)
             .select_from(ChapterRevisionMessageRevision)
             .join(ChapterRevisionMessageRevision.message_revision)
             .join(MessageRevision.message)
             .filter(ChapterRevisionMessageRevision.chapter_revision_id == context.latest_revision.id)
-            # TODO join messages
+            .options(joinedload(MessageRevision.message))
             .order_by(ChapterRevisionMessageRevision.number).all()
         ),
     }
