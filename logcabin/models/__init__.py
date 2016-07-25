@@ -147,6 +147,12 @@ class MSPARPSource(Source):
 
 
 class Chapter(Base, Resource):
+    def __acl__(self):
+        return (
+            (Allow, Authenticated, "view"),
+            (Allow, self.creator_id, "edit"),
+        )
+
     __tablename__ = "chapters"
     id = Column(Integer, primary_key=True)
     log_id = Column(Integer, ForeignKey(Log.id), nullable=False)

@@ -85,10 +85,8 @@ def logs_chapter_get(context, request):
     }
 
 
-@view_config(route_name="logs.chapter", request_method="POST")
+@view_config(route_name="logs.chapter", request_method="POST", permission="edit")
 def logs_chapter_post(context, request):
-    if request.user != context.creator:
-        raise HTTPNotFound
 
     # TODO edit locking or some shit
     messages = (
@@ -150,12 +148,10 @@ def logs_chapter_post(context, request):
     return HTTPFound(request.route_path("logs.chapter", log_id=context.log_id, number=context.number))
 
 
-@view_config(route_name="logs.chapter.message", request_method="GET", renderer="logs/message.mako")
-@view_config(route_name="logs.chapter.message.ext", extension="json", request_method="GET", renderer="json")
-@view_config(route_name="logs.chapter.message.ext", extension="yaml", request_method="GET", renderer="yaml")
+@view_config(route_name="logs.chapter.message", request_method="GET", permission="edit", renderer="logs/message.mako")
+@view_config(route_name="logs.chapter.message.ext", extension="json", request_method="GET", permission="edit", renderer="json")
+@view_config(route_name="logs.chapter.message.ext", extension="yaml", request_method="GET", permission="edit", renderer="yaml")
 def logs_chapter_message_get(context, request):
-    if request.user != context.creator:
-        raise HTTPNotFound
 
     try:
         message_revision = (
