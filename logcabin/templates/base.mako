@@ -37,6 +37,8 @@
 ${next.body()}
 </main>
 
+<footer></footer>
+
 <script src="/static/logcabin.js"></script>
 
 </body>

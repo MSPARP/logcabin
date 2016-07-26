@@ -12,24 +12,33 @@ body.unauthenticated #account_forms > p { color: #fff; }
 
 /* Main layout */
 
-body { background-color: #eee; line-height: 1.5; }
-h1 { margin: 2rem 0 0; font-weight: normal; text-align: center; }
+body { background-color: #d3ccc8; line-height: 1.5; }
+h1 { font-weight: normal; text-align: center; }
 
-body > header { overflow: hidden; background-color: #999; line-height: 2.5rem; }
+body > header { overflow: hidden; background-color: #15392b; line-height: 4.5rem; }
 #header_inner { max-width: 900px; margin: 0 auto; }
 #logo { float: left; margin: 0; font-size: 1.5rem; }
 header nav { float: left; }
 header ul { margin: 0; padding: 0; list-style-type: none; }
 header li { float: left; margin-left: 0.75rem; }
+header a { color: #fff; }
 
 #flash_messages { margin-top: 0; padding: 0; list-style-type: none; text-align: center; }
 #flash_messages li { padding: 5px 10px; background-color: #fff; }
+
+main { max-width: 900px; margin: 50px auto; padding: 0 20px; }
 
 #breadcrumb ul { margin: 10px 0 0; padding: 0; list-style-type: none; }
 #breadcrumb li { display: inline; }
 #breadcrumb li::after { content: " »"; }
 
-main { max-width: 900px; margin: 0 auto; }
+h2 { display: inline-block; margin-bottom: 5px; padding: 10px 20px; background-color: #fff; }
+
+.body_section { padding: 20px; background-color: #fff; }
+.body_section > :first-child { margin-top: 0; }
+.body_section > :last-child { margin-bottom: 0; }
+
+footer { min-height: 25px; background-color: #15392b; }
 
 /* Logs */
 
