@@ -12,8 +12,10 @@ body.unauthenticated #account_forms > p { color: #fff; }
 
 /* Main layout */
 
-body { background-color: #d3ccc8; line-height: 1.5; }
-h1 { font-weight: normal; text-align: center; }
+html, body { min-height: 100vh; }
+
+body { display: flex; flex-direction: column; background-color: #d3ccc8; line-height: 1.5; }
+h1, h2 { font-weight: normal; color: #391c09; }
 
 body > header { overflow: hidden; background-color: #15392b; line-height: 4.5rem; }
 #header_inner { max-width: 900px; margin: 0 auto; }
@@ -26,17 +28,13 @@ header a { color: #fff; }
 #flash_messages { margin-top: 0; padding: 0; list-style-type: none; text-align: center; }
 #flash_messages li { padding: 5px 10px; background-color: #fff; }
 
-main { max-width: 900px; margin: 50px auto; padding: 0 20px; }
+main { flex: 1; width: 100%; max-width: 900px; margin: 30px auto 50px; padding: 0 20px; }
 
 #breadcrumb ul { margin: 10px 0 0; padding: 0; list-style-type: none; }
 #breadcrumb li { display: inline; }
 #breadcrumb li::after { content: " »"; }
 
-h2 { display: inline-block; margin-bottom: 5px; padding: 10px 20px; background-color: #fff; }
-
-.body_section { padding: 20px; background-color: #fff; }
-.body_section > :first-child { margin-top: 0; }
-.body_section > :last-child { margin-bottom: 0; }
+#content { overflow: hidden; padding: 0 25px; background-color: #fff; box-shadow: 0 2px 10px rgba(57, 28, 9, 0.25); }
 
 footer { min-height: 25px; background-color: #15392b; }
 
