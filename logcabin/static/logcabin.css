@@ -41,13 +41,10 @@ footer { min-height: 25px; background-color: #15392b; }
 /* Logs */
 
 #author { margin-top : 0; text-align: center; }
-#summary { max-width: 500px; margin: 2rem auto; }
 
-#log_body { overflow: hidden; max-width: 900px; margin: 0 auto; background-color: #fff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; font-family: serif; }
-#log_body > header { padding: 75px 100px; border-bottom: 1px solid #ddd; }
-#log_body > section { margin: 75px 100px; font-size: 1.2rem; }
-#log_body > section h1 { margin: 0 0 3rem; }
-#log_body p { line-height: 2rem; }
+.log_body section { margin: 75px 100px; font-family: serif; font-size: 1.2rem; }
+.log_body section h1 { margin: 0 0 3rem; }
+.log_body p { line-height: 2rem; }
 
 #save_chapter { position: fixed; right: 20px; bottom: 20px; }
 
