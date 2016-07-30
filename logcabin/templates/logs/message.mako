@@ -8,9 +8,11 @@
   </ul>
 </nav>
 <h1>Edit message</h1>
-<div id="content">
+<div id="content" class="log_body">
   <form action="${request.route_path("logs.chapter", log_id=request.context.log_id, number=request.context.number)}" method="post">
-    <p><textarea name="edit_${message_revision.message.id}">${message_revision.text}</textarea></p>
-    <p><button type="submit">Save</button></p>
+    <section>
+      <textarea name="edit_${message_revision.message.id}">${message_revision.text}</textarea>
+      <button type="submit">Save</button>
+    </section>
   </form>
 </div>

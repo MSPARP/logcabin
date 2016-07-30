@@ -1,5 +1,6 @@
 (function() {
 
+    // AJAX forms
     if (window.fetch) {
         var standard_headers = new Headers();
         standard_headers.append("X-Requested-With", "XMLHttpRequest");
@@ -33,6 +34,32 @@
                         error_container.textContent = "This request couldn't be completed. Please try again later.";
                     }
                 });
+            });
+        }
+    }
+
+    // Chapter editing
+    if (window.fetch && document.body.classList.contains("editable")) {
+        for (var link of document.querySelectorAll(".edit_link")) {
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var link = this;
+                fetch(this.href + ".json", {
+                    method: "GET",
+                    headers: standard_headers,
+                    credentials: "include",
+                }).then(response => response.json()).then(function(data) { // TODO i have no idea about browser support for arrow functions
+                    var textarea = document.createElement("textarea");
+                    textarea.name = link.parentNode.parentNode.id.replace("message_","edit_");
+                    textarea.innerHTML = data.text;
+                    link.parentNode.previousElementSibling.remove();
+                    link.parentNode.parentNode.insertBefore(textarea, link.parentNode);
+                    textarea.style.height = textarea.scrollHeight + "px";
+                    textarea.addEventListener("keyup", function() {
+                        this.style.height = this.scrollHeight - 40 + "px";
+                    });
+                }); // TODO catch
             });
         }
     }

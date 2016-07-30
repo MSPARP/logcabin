@@ -1,4 +1,5 @@
 <%inherit file="/base.mako" />
+<%block name="body_class">${"editable" if request.context.log.creator == request.user else ""}</%block>
 <%block name="title">${request.context.log.name}, ${request.context.name} - </%block>
 <nav id="breadcrumb">
   <ul>
@@ -15,11 +16,15 @@
       <p>log info description tags etc</p>
     </header>
     % for message_revision in messages:
-    <section id="message${message_revision.message.id}">
-      ${message_revision.html_text|n}
+    <section id="message_${message_revision.message.id}">
+      <div class="message_body">
+        ${message_revision.html_text|n}
+      </div>
       % if request.context.log.creator == request.user:
-      <a href="${request.route_path("logs.chapter.message", log_id=request.context.log.id, number=request.context.number, message_id=message_revision.message.id)}">Edit</a>
-      <label><input type="checkbox" name="delete_${message_revision.message.id}"> Delete</label>
+      <div class="controls">
+        <a class="edit_link" href="${request.route_path("logs.chapter.message", log_id=request.context.log.id, number=request.context.number, message_id=message_revision.message.id)}">Edit</a>
+        <label><input type="checkbox" name="delete_${message_revision.message.id}"> Delete</label>
+      </div>
       % endif
     </section>
     % endfor
