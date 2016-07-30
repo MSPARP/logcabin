@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from markdown import Markdown
 from markupsafe import escape
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
@@ -120,7 +122,8 @@ def logs_chapter_post(context, request):
 
     if deleted_message_revisions or changed_message_revisions:
         # Create a new chapter revision by copying the message revision ids from the old one...
-        new_chapter_revision = ChapterRevision(chapter=context, creator=request.user)
+        new_chapter_revision = ChapterRevision(chapter=context, creator=request.user, created=datetime.now())
+        context.log.last_modified = new_chapter_revision.created
         request.db.flush()
 
         message_revision_query = request.db.query(

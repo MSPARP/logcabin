@@ -1,4 +1,6 @@
-from pyramid.httpexceptions import HTTPNotFound
+from datetime import datetime
+
+from pyramid.httpexceptions import HTTPNotFound, HTTPNotModified
 from sqlalchemy import and_
 from sqlalchemy.exc import StatementError
 from sqlalchemy.orm import joinedload
@@ -19,6 +21,14 @@ def get_log(request):
         log = request.db.query(Log).filter(Log.id == int(request.matchdict["log_id"])).one()
     except (ValueError, NoResultFound):
         raise HTTPNotFound
+
+    request.response.headers["Cache-Control"] = "public;must-revalidate"
+    if "If-Modified-Since" in request.headers:
+        print(request.headers["If-Modified-Since"])
+        if_modified_since = datetime.strptime(request.headers["If-Modified-Since"], "%a, %d %b %Y %H:%M:%S UTC") # TODO make sure this is flexible enough
+        if log.last_modified.replace(microsecond=0) <= if_modified_since:
+            raise HTTPNotModified
+
     request.response.headers["Last-Modified"] = log.last_modified.strftime("%a, %d %b %Y %H:%M:%S UTC")
     return log
 
@@ -31,6 +41,14 @@ def get_chapter(request):
         )).options(joinedload(Chapter.log)).one()
     except (ValueError, NoResultFound):
         raise HTTPNotFound
+
+    request.response.headers["Cache-Control"] = "public;must-revalidate"
+    if "If-Modified-Since" in request.headers:
+        print(request.headers["If-Modified-Since"])
+        if_modified_since = datetime.strptime(request.headers["If-Modified-Since"], "%a, %d %b %Y %H:%M:%S UTC") # TODO make sure this is flexible enough
+        if chapter.latest_revision.created.replace(microsecond=0) <= if_modified_since:
+            raise HTTPNotModified
+
     request.response.headers["Last-Modified"] = chapter.latest_revision.created.strftime("%a, %d %b %Y %H:%M:%S UTC")
     return chapter
 
