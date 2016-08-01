@@ -104,7 +104,7 @@ class TumblrAccount(Base):
     oauth_secret = Column(Unicode(100), nullable=False)
     last_known_url = Column(Unicode(100), nullable=False)
 
-TumblrAccount.user = relationship(User, backref="tumblr_acounts")
+TumblrAccount.user = relationship(User, backref="tumblr_accounts")
 
 
 class Log(Base, Resource):

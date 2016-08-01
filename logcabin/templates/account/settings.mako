@@ -42,5 +42,12 @@
     <form action="${request.route_path("account.tumblr")}" method="post">
       <p><button>Connect a Tumblr account</button></p>
     </form>
+    % if request.user.tumblr_accounts:
+    <ul>
+      % for account in request.user.tumblr_accounts:
+      <li><a href="https://${account.last_known_url}.tumblr.com/">${account.last_known_url}</a></li>
+      % endfor
+    </ul>
+    % endif
   </section>
 </div>
