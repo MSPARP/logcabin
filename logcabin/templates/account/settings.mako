@@ -20,7 +20,6 @@
       <p class="controls"><button type="submit">Change</button></p>
     </form>
   </section>
-  % if cherubplay_accounts or msparp_accounts:
   <section>
     <h2>Linked accounts</h2>
     % if cherubplay_accounts:
@@ -39,7 +38,9 @@
       % endfor
     </ul>
     % endif
-    </div>
+    <h3>Tumblr</h3>
+    <form action="${request.route_path("account.tumblr")}" method="post">
+      <p><button>Connect a Tumblr account</button></p>
+    </form>
   </section>
 </div>
-% endif

@@ -2,6 +2,7 @@
 <%block name="title">Upload or import - </%block>
 <h1>Upload or import</h1>
 <div id="content">
+  % if cherubplay_chats or msparp_chats:
   % if cherubplay_chats:
   <section>
     <h2>Import from Cherubplay</h2>
@@ -27,5 +28,8 @@
     </ul>
     % endfor
   </section>
+  % endif
+  % else:
+  <p>You have no linked accounts to import from.</p>
   % endif
 </div>

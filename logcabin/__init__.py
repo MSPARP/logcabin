@@ -102,6 +102,8 @@ def main(global_config, **settings):
     config.add_route("account.settings", "/account/settings")
     config.add_route("account.change_password", "/account/change_password")
     config.add_route("account.change_email", "/account/change_email")
+    config.add_route("account.tumblr", "/account/tumblr")
+    config.add_route("account.tumblr.callback", "/account/tumblr/callback")
 
     config.add_route("users.profile", "/users/{username}", factory=get_user)
     config.add_ext_route("users.logs", "/users/{username}/logs", factory=get_user)

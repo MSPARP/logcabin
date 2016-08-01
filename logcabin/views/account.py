@@ -7,13 +7,14 @@ from pyramid.view import view_config
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message as EmailMessage
 from requests.exceptions import RequestException
+from requests_oauthlib import OAuth1Session
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from uuid import uuid4
 
 from logcabin.lib.cherubplay import CherubplayClient
 from logcabin.lib.msparp import MSPARPClient
-from logcabin.models import User
+from logcabin.models import User, TumblrAccount
 
 
 def error_response(request, message):
@@ -235,4 +236,68 @@ def change_email(request):
     send_email(request, "verify", request.user, email_address)
 
     return success_response(request, "Check your email and click the link to verify your new address.")
+
+
+@view_config(route_name="account.tumblr", request_method="POST")
+def tumblr(request):
+    oauth_session = OAuth1Session(
+        request.registry.settings["tumblr.oauth_key"],
+        client_secret=request.registry.settings["tumblr.oauth_secret"],
+    )
+
+    fetch_response = oauth_session.fetch_request_token("https://www.tumblr.com/oauth/request_token")
+    if (
+        not fetch_response.get("oauth_token")
+        or not fetch_response.get("oauth_token_secret")
+        or not fetch_response.get("oauth_callback_confirmed")
+    ):
+        raise HTTPBadRequest
+
+    # TODO store this somewhere more temporary
+    request.session["request_key"] = fetch_response["oauth_token"]
+    request.session["request_secret"] = fetch_response["oauth_token_secret"]
+
+    return HTTPFound(oauth_session.authorization_url("https://www.tumblr.com/oauth/authorize"))
+
+
+@view_config(route_name="account.tumblr.callback", request_method="GET")
+def tumblr_callback(request):
+    print("LOL")
+
+    if (
+        not request.GET.get("oauth_token")
+        or not request.GET.get("oauth_verifier")
+        or not request.session.get("request_key")
+        or not request.session.get("request_secret")
+        or request.GET["oauth_token"] != request.session["request_key"]
+    ):
+        raise HTTPBadRequest
+
+    request_token_session = OAuth1Session(
+        request.registry.settings["tumblr.oauth_key"],
+        client_secret=request.registry.settings["tumblr.oauth_secret"],
+        resource_owner_key=request.session["request_key"],
+        resource_owner_secret=request.session["request_secret"],
+        verifier=request.GET["oauth_verifier"],
+    )
+
+    oauth_tokens = request_token_session.fetch_access_token("https://www.tumblr.com/oauth/access_token")
+
+    oauth_token_session = OAuth1Session(
+        request.registry.settings["tumblr.oauth_key"],
+        client_secret=request.registry.settings["tumblr.oauth_secret"],
+        resource_owner_key=oauth_tokens["oauth_token"],
+        resource_owner_secret=oauth_tokens["oauth_token_secret"],
+    )
+
+    user_info = oauth_token_session.get("https://api.tumblr.com/v2/user/info")
+
+    request.db.add(TumblrAccount(
+        user=request.user,
+        oauth_key=oauth_tokens["oauth_token"],
+        oauth_secret=oauth_tokens["oauth_token_secret"],
+        last_known_url=user_info.json()["response"]["user"]["name"],
+    ))
+
+    return HTTPFound(request.route_path("account.settings"))
 
