@@ -96,6 +96,17 @@ Index("users_username", func.lower(User.username), unique=True)
 Index("users_email_address", func.lower(User.email_address), unique=True)
 
 
+class TumblrAccount(Base):
+    __tablename__ = "tumblr_accounts"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    oauth_key = Column(Unicode(100), nullable=False)
+    oauth_secret = Column(Unicode(100), nullable=False)
+    last_known_url = Column(Unicode(100), nullable=False)
+
+TumblrAccount.user = relationship(User, backref="tumblr_acounts")
+
+
 class Log(Base, Resource):
     __tablename__ = "logs"
     id = Column(Integer, primary_key=True)
