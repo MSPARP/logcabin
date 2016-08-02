@@ -193,9 +193,23 @@ def settings(request):
                 msparp_accounts = MSPARPClient(request).user_accounts(request.user)
         except RequestException:
             pass
+
+    tumblr_accounts = []
+    for account in request.user.tumblr_accounts:
+        oauth_token_session = OAuth1Session(
+            request.registry.settings["tumblr.oauth_key"],
+            client_secret=request.registry.settings["tumblr.oauth_secret"],
+            resource_owner_key=account.oauth_key,
+            resource_owner_secret=account.oauth_secret,
+        )
+        user_info = oauth_token_session.get("https://api.tumblr.com/v2/user/info")
+        # TODO error handling
+        tumblr_accounts.append((account, user_info.json()["response"]["user"]))
+
     return {
         "cherubplay_accounts": cherubplay_accounts,
         "msparp_accounts": msparp_accounts,
+        "tumblr_accounts": tumblr_accounts,
     }
 
 

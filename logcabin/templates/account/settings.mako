@@ -44,8 +44,8 @@
     </form>
     % if request.user.tumblr_accounts:
     <ul>
-      % for account in request.user.tumblr_accounts:
-      <li><a href="https://${account.last_known_url}.tumblr.com/">${account.last_known_url}</a></li>
+      % for account, user_info in tumblr_accounts:
+      <li><a href="https://${user_info["name"]}.tumblr.com/">${user_info["name"]}</a></li>
       % endfor
     </ul>
     % endif
