@@ -128,7 +128,7 @@ def forgot_password_get(request):
     return {}
 
 
-@view_config(route_name="account.forgot_password", request_method="POST", permission=NO_PERMISSION_REQUIRED, renderer="base_unauthenticated.mako")
+@view_config(route_name="account.forgot_password", request_method="POST", permission=NO_PERMISSION_REQUIRED, renderer="base.mako")
 def forgot_password_post(request):
     try:
         username = request.POST["username"].strip()[:User.username.type.length]

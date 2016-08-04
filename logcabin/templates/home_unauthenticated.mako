@@ -1,5 +1,7 @@
-<%inherit file="/base_unauthenticated.mako" />
+<%inherit file="/base.mako" />
 <% from logcabin.models import User %>
+<h1>Welcome to Log Cabin</h1>
+<div id="content">
   <form action="${request.route_path("account.register")}" method="post" class="ajax_form">
     <h3>Register</h3>
     <p class="error"></p>
@@ -17,4 +19,4 @@
     <p><a href="${request.route_path("account.forgot_password")}">Forgotten your password?</a></p>
     <p class="controls"><button type="submit">Log in</button></p>
   </form>
-
+</div>
