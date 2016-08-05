@@ -44,22 +44,35 @@
             link.addEventListener("click", function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+
                 var link = this;
+
+                if (link.parentNode.previousElementSibling.tagName == "TEXTAREA") {
+                    link.parentNode.previousElementSibling.remove();
+                    link.parentNode.previousElementSibling.style.display = "block";
+                    return;
+                }
+
+                if (link.classList.contains("loading")) { return; }
+                link.classList.add("loading");
+
                 fetch(this.href + ".json", {
                     method: "GET",
                     headers: standard_headers,
                     credentials: "include",
                 }).then(response => response.json()).then(function(data) { // TODO i have no idea about browser support for arrow functions
+                    link.classList.remove("loading");
+                    link.parentNode.previousElementSibling.style.display = "none";
                     var textarea = document.createElement("textarea");
                     textarea.name = link.parentNode.parentNode.id.replace("message_","edit_");
                     textarea.innerHTML = data.text;
-                    link.parentNode.previousElementSibling.remove();
                     link.parentNode.parentNode.insertBefore(textarea, link.parentNode);
                     textarea.style.height = textarea.scrollHeight + "px";
                     textarea.addEventListener("keyup", function() {
                         this.style.height = this.scrollHeight - 40 + "px";
                     });
                 }); // TODO catch
+
             });
         }
     }
