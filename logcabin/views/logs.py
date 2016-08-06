@@ -15,6 +15,58 @@ from logcabin.models import Chapter, ChapterRevision, ChapterRevisionMessageRevi
 md = Markdown()
 
 
+@view_config(route_name="logs.new", request_method="GET", renderer="logs/new.mako")
+def logs_new_get(request):
+    return {}
+
+
+@view_config(route_name="logs.new", request_method="POST", renderer="logs/new.mako")
+def logs_new_post(request):
+    messages = []
+
+    for message in request.POST.get("message", "").replace("\r\n", "\n").split("\n\n"):
+        message = message.strip()
+        if message:
+            messages.append(message)
+
+    if not messages:
+        return {} # TODO error
+
+    new_log = Log(
+        name="Untitled log",
+        creator=request.user,
+    )
+    request.db.add(new_log)
+    request.db.flush()
+
+    new_chapter = Chapter(log=new_log, number=1, name="Chapter 1", creator=request.user)
+    request.db.add(new_chapter)
+    request.db.flush()
+
+    new_chapter_revision = ChapterRevision(chapter=new_chapter, creator=request.user)
+
+    for number, message in enumerate(messages, 1):
+        new_message = Message(creator=request.user)
+        request.db.add(new_message)
+        request.db.flush()
+        new_message_revision = MessageRevision(
+            message=new_message,
+            creator=request.user,
+            text=message,
+            html_text=md.convert(escape(message)),
+
+        )
+        request.db.add(new_message_revision)
+        request.db.flush()
+        request.db.add(ChapterRevisionMessageRevision(
+            chapter_revision=new_chapter_revision,
+            message_revision=new_message_revision,
+            number=number,
+        ))
+
+    return HTTPFound(request.route_path("logs.log", log_id=new_log.id))
+
+
 @view_config(route_name="logs.log", permission=NO_PERMISSION_REQUIRED, renderer="logs/log.mako")
 @view_config(route_name="logs.log.ext", extension="json", permission=NO_PERMISSION_REQUIRED, renderer="json")
 @view_config(route_name="logs.log.ext", extension="yaml", permission=NO_PERMISSION_REQUIRED, renderer="yaml")
