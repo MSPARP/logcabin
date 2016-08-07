@@ -9,13 +9,14 @@ from logcabin.models import Favorite, Log, LogSubscription
 
 @view_config(route_name="users.profile", permission=NO_PERMISSION_REQUIRED, renderer="users/profile.mako")
 def users_profile(context, request):
+
+    recent_logs_query = request.db.query(Log).filter(Log.creator_id == context.id)
+    if context != request.user:
+        recent_logs_query = recent_logs_query.filter(Log.posted_anonymously == False)
+    recent_logs_query = recent_logs_query.order_by(Log.last_modified.desc()).limit(10).all()
+
     return {
-        "recent_logs": (
-            request.db.query(Log)
-            .filter(Log.creator_id == context.id)
-            .order_by(Log.last_modified.desc())
-            .limit(10).all()
-        ),
+        "recent_logs": recent_logs_query,
         "favorites": (
             request.db.query(Favorite)
             .filter(Favorite.user_id == context.id)

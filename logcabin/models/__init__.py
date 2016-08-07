@@ -115,6 +115,7 @@ class Log(Base, Resource):
     created = Column(DateTime, nullable=False, server_default=func.now())
     last_modified = Column(DateTime, nullable=False, server_default=func.now())
     summary = Column(Unicode(255))
+    posted_anonymously = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return "<Log #{}: {}>".format(self.id, self.name)

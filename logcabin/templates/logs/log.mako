@@ -1,7 +1,9 @@
 <%inherit file="/base.mako" />
 <%block name="title">${request.context.name} - </%block>
 <h1>${request.context.name}</h1>
+% if not request.context.posted_anonymously:
 <p id="author">by <a href="${request.route_path("users.profile", username=request.context.creator.username)}">${request.context.creator.username}</a></p>
+% endif
 <div id="content">
   <p id="summary">Summary: ${request.context.summary}</p>
   % if own_favorite:
