@@ -5,6 +5,7 @@ from markupsafe import escape
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.view import view_config
+from requests.exceptions import ConnectionError
 from sqlalchemy import and_, func, literal
 from sqlalchemy.orm import joinedload
 
@@ -82,15 +83,18 @@ def logs_log(context, request):
 
     sources = []
     if request.user == context.creator:
-        cherubplay = CherubplayClient(request)
-        user_accounts = cherubplay.user_accounts(request.user)
+        cherubplay = None
+        user_accounts = None
         for source in context.sources:
             if source.type == "cherubplay":
                 try:
+                    if cherubplay is None or user_accounts is None:
+                        cherubplay = CherubplayClient(request)
+                        user_accounts = cherubplay.user_accounts(request.user)
                     account = [account for account in user_accounts if account["id"] == source.account_id][0]
-                except IndexError:
-                    account = None
-                sources.append((source, cherubplay.chat_log(source.account_id, source.url), account))
+                    sources.append((source, cherubplay.chat_log(source.account_id, source.url), account))
+                except (ConnectionError, IndexError):
+                    continue
             else:
                 raise NotImplementedError
 
