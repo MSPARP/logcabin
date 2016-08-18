@@ -23,6 +23,12 @@ def logs_new_get(request):
 
 @view_config(route_name="logs.new", request_method="POST", renderer="logs/new.mako")
 def logs_new_post(request):
+    name = request.POST.get("name", "").strip()[:Log.name.type.length]
+    if not name:
+        return {"error": "name"}
+
+    summary = request.POST.get("summary", "").strip()
+
     messages = []
 
     for message in request.POST.get("message", "").replace("\r\n", "\n").split("\n\n"):
@@ -31,10 +37,11 @@ def logs_new_post(request):
             messages.append(message)
 
     if not messages:
-        return {} # TODO error
+        return {"error": "message"}
 
     new_log = Log(
-        name="Untitled log",
+        name=name,
+        summary=summary if summary else None,
         creator=request.user,
     )
     request.db.add(new_log)
