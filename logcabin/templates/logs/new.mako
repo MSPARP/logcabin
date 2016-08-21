@@ -9,6 +9,7 @@
     <p class="error">Please enter a name.</p>
     % endif
     <p>Summary: <textarea name="summary">${request.POST.get("summary", "")}</textarea></p>
+    <p><label><input type="checkbox" name="posted_anonymously"> Post anonymously</label></p>
     <section>
       <textarea name="message">${request.POST.get("message", "")}</textarea>
       % if error == "message":

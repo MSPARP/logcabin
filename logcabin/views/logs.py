@@ -43,6 +43,7 @@ def logs_new_post(request):
         name=name,
         summary=summary if summary else None,
         creator=request.user,
+        posted_anonymously="posted_anonymously" in request.POST,
     )
     request.db.add(new_log)
     request.db.flush()
