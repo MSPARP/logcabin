@@ -9,6 +9,7 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Index,
+    UniqueConstraint,
     Boolean,
     DateTime,
     Enum,
@@ -304,4 +305,20 @@ camel_registry.dumper(Favorite, "favorite", version=None)(Favorite.__json__)
 
 Favorite.user = relationship(User, backref="favorites")
 Favorite.log = relationship(Log, backref="favorites")
+
+
+class FandomCategory(Base):
+    __tablename__ = "fandom_categories"
+    id = Column(Integer, primary_key=True)
+    url_name = Column(URLSegment, nullable=False, unique=True)
+    name = Column(Unicode(100), nullable=False)
+
+
+class Fandom(Base):
+    __tablename__ = "fandoms"
+    __table_args__ = (UniqueConstraint("category_id", "url_name", name="fandom_category_unique"),)
+    id = Column(Integer, primary_key=True)
+    category_id = Column(Integer, ForeignKey(FandomCategory.id), nullable=False)
+    url_name = Column(URLSegment, nullable=False)
+    name = Column(Unicode(100), nullable=False)
 
