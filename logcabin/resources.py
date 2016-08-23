@@ -6,7 +6,7 @@ from sqlalchemy.exc import StatementError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
-from logcabin.models import User, Log, Chapter
+from logcabin.models import User, Log, Chapter, FandomCategory
 
 
 def get_user(request):
@@ -51,4 +51,11 @@ def get_chapter(request):
 
     request.response.headers["Last-Modified"] = chapter.latest_revision.created.strftime("%a, %d %b %Y %H:%M:%S UTC")
     return chapter
+
+
+def get_fandom_category(request):
+    try:
+        return request.db.query(FandomCategory).filter(FandomCategory.url_name == request.matchdict["category_url_name"]).one()
+    except (NoResultFound, StatementError):
+        raise HTTPNotFound
 
