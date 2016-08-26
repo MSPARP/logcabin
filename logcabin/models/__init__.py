@@ -322,3 +322,13 @@ class Fandom(Base):
     url_name = Column(URLSegment, nullable=False)
     name = Column(Unicode(100), nullable=False)
 
+Fandom.category = relationship(FandomCategory)
+
+
+class LogFandom(Base):
+    __tablename__ = "log_fandoms"
+    log_id = Column(Integer, ForeignKey(Log.id), primary_key=True)
+    fandom_id = Column(Integer, ForeignKey(Fandom.id), primary_key=True)
+
+Log.fandoms = relationship(Fandom, secondary=LogFandom.__table__, backref="logs")
+
