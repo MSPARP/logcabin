@@ -6,7 +6,7 @@ from sqlalchemy.exc import StatementError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
-from logcabin.models import User, Log, Chapter, FandomCategory
+from logcabin.models import User, Log, Chapter, FandomCategory, Fandom
 
 
 def get_user(request):
@@ -56,6 +56,17 @@ def get_chapter(request):
 def get_fandom_category(request):
     try:
         return request.db.query(FandomCategory).filter(FandomCategory.url_name == request.matchdict["category_url_name"]).one()
+    except (NoResultFound, StatementError):
+        raise HTTPNotFound
+
+
+def get_fandom(request):
+    category = get_fandom_category(request)
+    try:
+        return request.db.query(Fandom).filter(and_(
+            Fandom.category_id == category.id,
+            Fandom.url_name == request.matchdict["fandom_url_name"],
+        )).one()
     except (NoResultFound, StatementError):
         raise HTTPNotFound
 

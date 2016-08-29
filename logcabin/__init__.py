@@ -9,7 +9,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy.orm.exc import NoResultFound
 
 from logcabin.models import Base, Session, Resource, User
-from logcabin.resources import get_user, get_log, get_chapter, get_fandom_category
+from logcabin.resources import get_user, get_log, get_chapter, get_fandom_category, get_fandom
 
 
 def authentication_callback(userid, request):
@@ -124,7 +124,7 @@ def main(global_config, **settings):
 
     config.add_ext_route("fandoms.categories", "/fandoms")
     config.add_ext_route("fandoms.category", "/fandoms/{category_url_name}", factory=get_fandom_category)
-    config.add_ext_route("fandoms.fandom", "/fandoms/{category_url_name}/{fandom_url_name}")
+    config.add_ext_route("fandoms.fandom", "/fandoms/{category_url_name}/{fandom_url_name}", factory=get_fandom)
 
     config.scan()
     return config.make_wsgi_app()
