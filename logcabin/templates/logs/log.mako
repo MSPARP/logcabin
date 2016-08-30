@@ -27,6 +27,12 @@
     % endfor
   </ul>
   % endif
+  <h2>Fandoms</h2>
+  <ul>
+    % for fandom in log.fandoms:
+    <li><a href="${request.route_path("fandoms.fandom", category_url_name=fandom.category.url_name, fandom_url_name=fandom.url_name)}">${fandom.name}</a></li>
+    % endfor
+  </ul>
   <h2>Chapters</h2>
   <ol>
     % for chapter in oldest_chapters:
