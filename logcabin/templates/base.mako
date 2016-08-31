@@ -18,7 +18,13 @@
       <ul>
         <li><a href="${request.route_path("users.profile", username=request.user.username)}">Your cabin</a></li>
         <li><a href="${request.route_path("upload")}">Upload</a></li>
+        <li><a href="${request.route_path("fandoms.categories")}">Browse</a></li>
         <li><a href="${request.route_path("account.settings")}">Settings</a></li>
+        <li>
+          <form action="${request.route_path("account.log_out")}" method="post">
+            <button type="submit">Log out</button>
+          </form>
+        </li>
       </ul>
     </nav>
     % endif

@@ -2,10 +2,5 @@
 <%block name="title">Welcome to </%block>
 <h1>Log Cabin</h1>
 <div id="content">
-  <section>
-    <form action="${request.route_path("account.log_out")}" method="post">
-      <p>Logged in as ${request.user.username}.</p>
-      <p><button type="submit">Log out</button></p>
-    </form>
-  </section>
+  <p>Welcome to Log Cabin. <a href="${request.route_path("logs.new")}">Write a new log</a> or <a href="${request.route_path("fandoms.categories")}">browse existing ones</a>.</p>
 </div>
