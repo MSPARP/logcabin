@@ -1,6 +1,7 @@
 import datetime
 
 from bcrypt import gensalt, hashpw
+from collections import OrderedDict
 from pyramid.decorator import reify
 from pyramid.security import Allow, Authenticated, Everyone
 from sqlalchemy import (
@@ -118,6 +119,14 @@ class Log(Base, Resource):
     summary = Column(Unicode(255))
     posted_anonymously = Column(Boolean, nullable=False, default=False)
 
+    ratings = OrderedDict([
+        ("general", "General audiences"),
+        ("teen", "Teen and up"),
+        ("mature", "Mature"),
+        ("explicit", "Explicit"),
+    ])
+    rating = Column(Enum(ratings.keys(), name="log_rating"), nullable=False)
+
     def __repr__(self):
         return "<Log #{}: {}>".format(self.id, self.name)
 
@@ -130,6 +139,10 @@ class Log(Base, Resource):
             "last_modified": self.last_modified,
             "summary": self.summary,
         }
+
+    @property
+    def rating_name(self):
+        return self.ratings[self.rating]
 
 camel_registry.dumper(Log, "log", version=None)(Log.__json__)
 
