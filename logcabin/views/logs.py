@@ -27,8 +27,11 @@ def logs_new_post(request):
     if not name:
         return {"error": "name"}
 
-    summary = request.POST.get("summary", "").strip()
+    if request.POST.get("rating") not in Log.ratings:
+        raise Exception
+        return {"error": "rating"}
 
+    summary = request.POST.get("summary", "").strip()
     messages = []
 
     for message in request.POST.get("message", "").replace("\r\n", "\n").split("\n\n"):
@@ -44,6 +47,7 @@ def logs_new_post(request):
         summary=summary if summary else None,
         creator=request.user,
         posted_anonymously="posted_anonymously" in request.POST,
+        rating=request.POST["rating"]
     )
     request.db.add(new_log)
     request.db.flush()

@@ -8,6 +8,14 @@
     % if error == "name":
     <p class="error">Please enter a name.</p>
     % endif
+    <p>Rating: <select name="rating">
+      % for rating, name in Log.ratings.items():
+      <option value="${rating}">${name}</option>
+      % endfor
+    </select></p>
+    % if error == "rating":
+    <p class="error">Please select a rating.</p>
+    % endif
     <p>Summary: <textarea name="summary">${request.POST.get("summary", "")}</textarea></p>
     <p><label><input type="checkbox" name="posted_anonymously"> Post anonymously</label></p>
     <section>

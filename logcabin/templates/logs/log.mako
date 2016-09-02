@@ -5,6 +5,7 @@
 <p id="author">by <a href="${request.route_path("users.profile", username=request.context.creator.username)}">${request.context.creator.username}</a></p>
 % endif
 <div id="content">
+  <p>Rating: ${request.context.rating_name}</p>
   <p id="summary">Summary: ${request.context.summary}</p>
   % if own_favorite:
   <form action="${request.route_path("logs.unfavorite", log_id=request.context.id)}" method="post">
