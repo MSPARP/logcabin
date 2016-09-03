@@ -16,5 +16,9 @@ def fandom_category(context, request):
 
 @view_config(route_name="fandoms.fandom", permission=NO_PERMISSION_REQUIRED, renderer="fandoms/fandom.mako")
 def fandom_fandom(context, request):
-    return {"logs": request.db.query(Log).join(Log.fandoms).filter(LogFandom.fandom_id == context.id).order_by(Log.id.desc()).all()}
+    log_query = request.db.query(Log).join(Log.fandoms).filter(LogFandom.fandom_id == context.id)
+    if request.GET.get("rating") in Log.ratings:
+        log_query = log_query.filter(Log.rating == request.GET["rating"])
+    log_query = log_query.order_by(Log.id.desc())
+    return {"logs": log_query.all()}
 
