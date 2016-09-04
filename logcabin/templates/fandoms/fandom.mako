@@ -1,5 +1,6 @@
 <%inherit file="/base.mako" />
 <%block name="title">${request.context.name} - </%block>
+<% from logcabin.models import Log %>
 <nav id="breadcrumb">
   <ul>
     <li><a href="${request.route_path("fandoms.categories")}">Fandoms</a></li>
@@ -8,6 +9,21 @@
 </nav>
 <h1>${request.context.name}</h1>
 <div id="content">
+  <p>
+    Rating:
+    % if not request.GET.get("rating"):
+    All
+    % else:
+    <a href="${request.current_route_path(_query={})}">All</a>
+    % endif
+    % for rating, name in Log.ratings.items():
+    % if request.GET.get("rating") == rating:
+    ${name}
+    % else:
+    <a href="${request.current_route_path(_query={"rating": rating})}">${name}</a>
+    % endif
+    % endfor
+  </p>
   % if logs:
   <ul>
     % for log in logs:
