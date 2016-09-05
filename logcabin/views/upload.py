@@ -17,6 +17,7 @@ from logcabin.models import User, Log, CherubplaySource, Chapter, ChapterRevisio
 md = Markdown()
 
 
+"""
 @view_config(route_name="upload", renderer="upload/index.mako")
 def upload(request):
     cherubplay_chats = OrderedDict()
@@ -180,4 +181,4 @@ def upload_msparp_get(request):
         "account": user_account,
         "chat_log": chat_log,
     }
-
+"""

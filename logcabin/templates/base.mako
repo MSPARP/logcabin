@@ -17,7 +17,6 @@
     <nav>
       <ul>
         <li><a href="${request.route_path("users.profile", username=request.user.username)}">Your cabin</a></li>
-        <li><a href="${request.route_path("upload")}">Upload</a></li>
         <li><a href="${request.route_path("fandoms.categories")}">Browse</a></li>
         <li><a href="${request.route_path("account.settings")}">Settings</a></li>
         <li>

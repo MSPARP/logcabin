@@ -185,6 +185,9 @@ def verify_email(request):
 def settings(request):
     cherubplay_accounts = []
     msparp_accounts = []
+    tumblr_accounts = []
+
+    """
     if request.user.email_verified:
         try:
             if "urls.cherubplay" in request.registry.settings:
@@ -194,7 +197,6 @@ def settings(request):
         except RequestException:
             pass
 
-    tumblr_accounts = []
     for account in request.user.tumblr_accounts:
         oauth_token_session = OAuth1Session(
             request.registry.settings["tumblr.oauth_key"],
@@ -205,6 +207,7 @@ def settings(request):
         user_info = oauth_token_session.get("https://api.tumblr.com/v2/user/info")
         # TODO error handling
         tumblr_accounts.append((account, user_info.json()["response"]["user"]))
+    """
 
     return {
         "cherubplay_accounts": cherubplay_accounts,

@@ -21,7 +21,6 @@
     </form>
   </section>
   <section>
-    <h2>Linked accounts</h2>
     % if cherubplay_accounts:
     <h3>Cherubplay</h3>
     <ul>
@@ -35,17 +34,6 @@
     <ul>
       % for account in msparp_accounts:
       <li>${account["username"]}</li>
-      % endfor
-    </ul>
-    % endif
-    <h3>Tumblr</h3>
-    <form action="${request.route_path("account.tumblr")}" method="post">
-      <p><button>Connect a Tumblr account</button></p>
-    </form>
-    % if request.user.tumblr_accounts:
-    <ul>
-      % for account, user_info in tumblr_accounts:
-      <li><a href="https://${user_info["name"]}.tumblr.com/">${user_info["name"]}</a></li>
       % endfor
     </ul>
     % endif
