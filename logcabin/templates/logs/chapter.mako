@@ -13,8 +13,9 @@
   <form action="${request.route_path("logs.chapter", log_id=request.context.log_id, number=request.context.number)}" method="post">
   % endif
     <header>
-      <p>log info description tags etc</p>
+      <p>Summary: ${request.context.log.summary}</p>
     </header>
+    <hr>
     % for message_revision in messages:
     <section id="message_${message_revision.message.id}">
       <div class="message_body">
